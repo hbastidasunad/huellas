@@ -1,0 +1,2551 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EFP Platform - Huella Hídrica y de Carbono</title>
+  <meta name="description" content="Plataforma enterprise para contabilidad ambiental determinista, cálculo de Huella de Carbono (Alcance 1, 2 y 3) y Balance Hídrico (ISO 14046 / ISO 14064) con gobernanza, sellado criptográfico y backend en Supabase." />
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234edea3'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z'/%3E%3C/svg%3E" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Bootstrap 5.3.3 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+  
+  <!-- Bootstrap Icons 1.11.3 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+  <!-- Compiled Tailwind CSS from React Application -->
+  <link rel="stylesheet" href="css/tailwind.css" />
+
+  <!-- Custom Design System & Glassmorphism -->
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <!-- Ambient Lighting Effects -->
+  <div class="ambient-glow-1"></div>
+  <div class="ambient-glow-2"></div>
+
+  <!-- Top Header matching React Header.tsx -->
+  <header class="fixed top-0 left-0 right-0 h-16 z-50 bg-surface-container-lowest/80 backdrop-blur-xl border-b border-white/5 shadow-[0_1px_8px_rgba(0,0,0,0.45)]">
+    <div class="h-full w-full px-4 sm:px-6 flex items-center justify-between gap-4">
+      <!-- Logo & Platform Identity -->
+      <div class="flex items-center gap-6">
+        <a href="#landing" data-view="landing" class="flex items-center gap-3 text-left group focus:outline-none text-decoration-none cursor-pointer">
+          <img 
+            src="https://lh3.googleusercontent.com/aida/AEtjO1WAjTwqKtRqUfSj67wFHBz5ZHTYWcwvM-12YF-_ndDfjRU6XAAmkJ6o9N52syozqmTi8Iy8FOaf3mU4mlxqrFp-GlJp4t8-teDoGE0SQswZUsYL4rFpDiopZ74Sdt-yi91kLzktxZPD1zsTi1tsnRmUNunT9ChTm6qJT4ViyLVqsx_onAmsiTRNbFbpJtxblMZrNJEpAZDxU6g8057Fxr6kBUFaEcGPdODaLk4dHnY6ye9-7s8xggtNSetg" 
+            alt="EFP Platform Logo" 
+            class="h-8 w-auto object-contain transition-transform group-hover:scale-105"
+          />
+          <div class="flex flex-col">
+            <span class="font-title-md text-base tracking-tight text-white font-bold leading-none">
+              EFP Platform
+            </span>
+            <span class="font-label-sm text-[11px] uppercase tracking-wider text-secondary font-semibold mt-0.5 leading-none">
+              ESG Accounting
+            </span>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <nav class="hidden lg:flex items-center gap-1 p-1 rounded-xl bg-surface-container-lowest/40 border border-white/5" id="header-desktop-nav">
+          <button data-view="landing" class="nav-link-custom px-3 py-1.5 rounded-lg text-xs font-label-md transition-all text-on-surface-variant hover:text-on-surface hover:bg-surface-container/60 cursor-pointer border-0 bg-transparent">
+            Solución
+          </button>
+          <button data-view="dashboard" class="nav-link-custom active px-3 py-1.5 rounded-lg text-xs font-label-md transition-all bg-surface-container-high text-primary font-bold shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)] cursor-pointer border-0">
+            Panel de Control
+          </button>
+          <button data-view="ingesta" class="nav-link-custom px-3 py-1.5 rounded-lg text-xs font-label-md transition-all text-on-surface-variant hover:text-on-surface hover:bg-surface-container/60 cursor-pointer border-0 bg-transparent">
+            Carga Masiva
+          </button>
+          <button data-view="subsanacion" class="nav-link-custom px-3 py-1.5 rounded-lg text-xs font-label-md transition-all flex items-center gap-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container/60 cursor-pointer border-0 bg-transparent">
+            <span>Subsanación</span>
+            <span id="badge-subsanacion-count" class="font-mono-audit text-[10px] bg-tertiary-container/30 text-tertiary px-1.5 py-0.5 rounded font-semibold border border-tertiary/20">
+              5
+            </span>
+          </button>
+          <button data-view="enmienda" class="nav-link-custom px-3 py-1.5 rounded-lg text-xs font-label-md transition-all text-on-surface-variant hover:text-on-surface hover:bg-surface-container/60 cursor-pointer border-0 bg-transparent">
+            Revisión HSEQ
+          </button>
+          <button data-view="notificaciones" class="nav-link-custom px-3 py-1.5 rounded-lg text-xs font-label-md transition-all text-on-surface-variant hover:text-on-surface hover:bg-surface-container/60 cursor-pointer border-0 bg-transparent">
+            Forense / Errores
+          </button>
+
+          <!-- Admin Exclusive Links -->
+          <div id="header-admin-links" class="flex items-center gap-1">
+            <button data-view="usuarios" class="nav-link-custom nav-link-admin flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-label-md transition-all cursor-pointer border border-secondary/30 text-secondary hover:text-white hover:bg-secondary/15 font-semibold bg-transparent">
+              <i class="bi bi-people"></i>
+              <span>Usuarios</span>
+            </button>
+            <button data-view="sedes" class="nav-link-custom nav-link-admin flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-label-md transition-all cursor-pointer border border-secondary/30 text-secondary hover:text-white hover:bg-secondary/15 font-semibold bg-transparent">
+              <i class="bi bi-buildings"></i>
+              <span>Sedes</span>
+            </button>
+            <button data-view="factores" class="nav-link-custom nav-link-admin flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-label-md transition-all cursor-pointer border border-secondary/30 text-secondary hover:text-white hover:bg-secondary/15 font-semibold bg-transparent">
+              <i class="bi bi-fire"></i>
+              <span>Factores</span>
+            </button>
+            <button data-view="periodos" class="nav-link-custom nav-link-admin flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-label-md transition-all cursor-pointer border border-secondary/30 text-secondary hover:text-white hover:bg-secondary/15 font-semibold bg-transparent">
+              <i class="bi bi-calendar3"></i>
+              <span>Períodos</span>
+            </button>
+            <button data-view="administracion" class="nav-link-custom nav-link-admin flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-label-md transition-all cursor-pointer border border-secondary/30 text-secondary hover:text-white hover:bg-secondary/15 font-semibold bg-transparent">
+              <i class="bi bi-shield-check"></i>
+              <span>Panel Admin</span>
+            </button>
+          </div>
+        </nav>
+      </div>
+
+      <!-- Right Side Tools & Profile -->
+      <div class="flex items-center gap-2.5">
+        <!-- Period Status Indicator -->
+        <div class="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-low border border-white/5 shadow-inner">
+          <span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+          <span class="font-mono-audit text-xs text-on-surface-variant">Período:</span>
+          <span class="font-mono-audit text-xs text-secondary font-semibold">2026-ANUAL (v1)</span>
+        </div>
+
+        <!-- Notifications Button -->
+        <button data-view="notificaciones" aria-label="Notificaciones del Sistema" class="relative p-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors cursor-pointer border-0 bg-transparent">
+          <i class="bi bi-bell text-lg"></i>
+          <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-tertiary ring-2 ring-surface-container-lowest"></span>
+        </button>
+
+        <!-- User Profile Dropdown -->
+        <div class="dropdown" id="header-profile-dropdown">
+          <button class="flex items-center gap-2 p-1 pl-2 pr-2.5 rounded-full hover:bg-surface-container-high transition-all border border-white/5 cursor-pointer bg-transparent" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <img id="header-user-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80" alt="Avatar" width="28" height="28" class="rounded-full ring-1 ring-secondary/40 object-cover shadow-[0_0_8px_rgba(78,222,163,0.3)]" />
+            <div class="hidden md:flex flex-col text-left">
+              <span id="header-user-role" class="font-label-md text-xs text-on-surface font-semibold leading-tight">Administrador General</span>
+              <span id="header-user-name" class="font-label-sm text-[10px] text-on-surface-variant leading-tight">Administrador Principal</span>
+            </div>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end glass-dropdown border border-white/15 p-2 shadow-2xl" style="min-width: 270px;">
+            <li class="px-3 py-2 border-b border-white/10 mb-1">
+              <p id="dropdown-user-fullname" class="font-label-md text-xs font-bold text-white mb-0">Administrador Principal</p>
+              <p id="dropdown-user-email" class="font-mono-audit text-white/50 text-[11px] mb-1 truncate">admin@corporacion.com</p>
+              <div class="flex items-center justify-between">
+                <span id="dropdown-user-badge" class="badge bg-secondary/20 text-secondary border border-secondary/30 font-mono-audit text-[9px]">
+                  Usuario: admin
+                </span>
+                <span id="dropdown-user-uid" class="font-mono-audit text-secondary text-[9px]">UID: 123123</span>
+              </div>
+            </li>
+            
+            <!-- Admin Shortcuts in Dropdown -->
+            <li id="dropdown-admin-shortcuts">
+              <a class="dropdown-item rounded-lg text-secondary text-xs py-1.5 flex items-center justify-between font-bold" href="#usuarios" data-view="usuarios">
+                <span class="flex items-center gap-2"><i class="bi bi-people"></i> Gestión de Usuarios (RBAC)</span>
+                <span class="font-mono-audit badge bg-secondary/20 text-secondary text-[8px]">Módulo</span>
+              </a>
+              <a class="dropdown-item rounded-lg text-secondary text-xs py-1.5 flex items-center justify-between font-bold" href="#sedes" data-view="sedes">
+                <span class="flex items-center gap-2"><i class="bi bi-buildings"></i> Gestión de Sedes (Multi-Sitio)</span>
+                <span class="font-mono-audit badge bg-secondary/20 text-secondary text-[8px]">Módulo</span>
+              </a>
+              <a class="dropdown-item rounded-lg text-secondary text-xs py-1.5 flex items-center justify-between font-bold" href="#factores" data-view="factores">
+                <span class="flex items-center gap-2"><i class="bi bi-fire"></i> Factores de Emisión (GHG)</span>
+                <span class="font-mono-audit badge bg-secondary/20 text-secondary text-[8px]">Módulo</span>
+              </a>
+              <a class="dropdown-item rounded-lg text-secondary text-xs py-1.5 flex items-center justify-between font-bold" href="#periodos" data-view="periodos">
+                <span class="flex items-center gap-2"><i class="bi bi-calendar3"></i> Períodos Contables (Ledger)</span>
+                <span class="font-mono-audit badge bg-secondary/20 text-secondary text-[8px]">Módulo</span>
+              </a>
+              <a class="dropdown-item rounded-lg text-secondary text-xs py-1.5 flex items-center justify-between font-bold" href="#admin" data-view="administracion">
+                <span class="flex items-center gap-2"><i class="bi bi-shield-check"></i> Panel de Administración Central</span>
+                <span class="font-mono-audit badge bg-secondary/20 text-secondary text-[8px]">Admin</span>
+              </a>
+              <hr class="dropdown-divider border-white/10 my-1" />
+            </li>
+
+            <li>
+              <a class="dropdown-item rounded-lg text-white text-xs py-1.5 flex items-center justify-between" href="#" data-bs-toggle="modal" data-bs-target="#modalAdmin">
+                <span class="flex items-center gap-2"><i class="bi bi-shield-lock text-secondary"></i> Perfil &amp; Admin (UID 123123)</span>
+                <span class="font-mono-audit badge bg-secondary/20 text-secondary text-[8px]">SuperAdmin</span>
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item rounded-lg text-white text-xs py-1.5 flex items-center justify-between" href="#login" data-view="login">
+                <span class="flex items-center gap-2"><i class="bi bi-person-badge text-primary"></i> Cambiar de Usuario</span>
+                <span class="font-mono-audit text-primary text-[10px]">Login</span>
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item rounded-lg text-white text-xs py-1.5 flex items-center justify-between" href="#" data-bs-toggle="modal" data-bs-target="#modalSupabase">
+                <span class="flex items-center gap-2"><i class="bi bi-database text-secondary"></i> Configurar Supabase</span>
+                <span class="w-2 h-2 rounded-full bg-secondary"></span>
+              </a>
+            </li>
+            <li><hr class="dropdown-divider border-white/10 my-1" /></li>
+            <li>
+              <a class="dropdown-item rounded-lg text-error text-xs py-1.5 flex items-center gap-2" id="btn-logout" href="#logout">
+                <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       MAIN CONTENT - VIEW CONTAINERS (SPA NAVIGATION)
+       ========================================================================= -->
+  <div class="main-layout-container">
+    <main id="main-content-area" class="main-content-area flex-grow-1 position-relative z-1 py-4 with-sidebar">
+
+        <!-- 1. VIEW: LANDING PAGE (7 FULL SECTIONS MATCHING REACT ORIGINAL) -->
+    <section id="view-landing" class="view-container">
+      
+      <!-- Atmospheric Glows -->
+      <div class="ambient-glow-top"></div>
+      <div class="ambient-glow-left"></div>
+      <div class="ambient-glow-right"></div>
+
+      <!-- SECTION 1: HERO & INTERACTIVE PREVIEW -->
+      <div class="container py-4 py-lg-5 text-center" style="max-width: 1200px;">
+        <!-- Top Pill Badge -->
+        <div class="d-inline-flex align-items-center gap-2 px-3.5 py-1.5 rounded-pill glass-panel mb-4 border border-white-10 shadow-sm">
+          <span class="pulse-dot bg-secondary"></span>
+          <span class="font-mono-audit text-secondary small fw-bold tracking-wider">
+            SISTEMA DETERMINISTA ENTERPRISE • ISO 14064-1 &amp; ISO 14046
+          </span>
+          <i class="bi bi-shield-check text-primary"></i>
+        </div>
+
+        <!-- Headline -->
+        <h1 class="font-display-lg display-4 fw-extrabold text-white mb-3 tracking-tight" style="max-width: 1050px; margin-left: auto; margin-right: auto; line-height: 1.15;">
+          Contabilidad Ambiental de Grado Auditoría: <br class="d-none d-md-inline" />
+          <span class="text-transparent bg-clip-text" style="background: linear-gradient(90deg, #93ccff, #3198dc, #4edea3); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            Huella de Carbono y Balance Hídrico
+          </span> sin Conjeturas ni Desvíos.
+        </h1>
+
+        <!-- Subtitle -->
+        <p class="lead text-white-50 mx-auto mb-4 fs-6" style="max-width: 840px;">
+          Centralice la ingesta de hasta 100.000 registros, valide mediante algoritmos deterministas con decimal.js, bloquee períodos con sellado criptográfico SHA-256 e inspeccione evidencias en una plataforma construida para superar cualquier auditoría HSEQ.
+        </p>
+
+        <!-- CTAs -->
+        <div class="d-flex flex-wrap align-items-center justify-content-center gap-3 mb-5">
+          <a href="#demo-section" class="btn btn-efp-primary px-4 py-2.5 font-headline small">
+            <i class="bi bi-calendar-check me-2"></i> Agendar Demostración Técnica
+          </a>
+          <button class="btn btn-efp-glass px-4 py-2.5 font-headline small" data-view="dashboard">
+            <i class="bi bi-terminal text-primary me-2"></i> Explorar Panel Interactivo
+          </button>
+        </div>
+
+        <!-- Glass Hero Preview Card (Live Mini Dashboard) -->
+        <div class="glass-panel p-4 p-md-5 rounded-4 shadow-lg text-start mb-5 border border-white-15 position-relative overflow-hidden">
+          <div class="position-absolute top-0 start-0 end-0" style="height: 3px; background: linear-gradient(90deg, transparent, #3198dc, #4edea3);"></div>
+
+          <!-- App Header Bar Inside Card -->
+          <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pb-3 mb-4 bg-dark bg-opacity-60 p-3 rounded-3 border border-white-5">
+            <div class="d-flex align-items-center gap-3">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-tree-fill text-secondary fs-5"></i>
+                <span class="font-headline text-white small fw-bold">
+                  Resumen de Huella Ambiental Organizacional
+                </span>
+              </div>
+              <span class="d-none d-lg-inline-flex align-items-center gap-1.5 px-2.5 py-0.5 rounded-pill bg-warning bg-opacity-20 text-warning font-mono-audit small fw-semibold border border-warning border-opacity-30">
+                <span class="pulse-dot bg-warning"></span> EN REVISIÓN HSEQ
+              </span>
+            </div>
+            <div class="d-flex align-items-center gap-2 font-mono-audit small text-white-50 flex-wrap">
+              <span>Período: <strong class="text-white">2026-ANUAL</strong></span>
+              <span>•</span>
+              <span>Versión: <strong class="text-secondary">v1.2-FINAL</strong></span>
+              <span>•</span>
+              <span class="d-none d-sm-inline">SHA-256: 89c44e...9f01e2ac</span>
+            </div>
+          </div>
+
+          <!-- 4 KPIs Grid -->
+          <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3">
+              <div class="p-3.5 rounded-3 glass-card h-100 d-flex flex-column justify-content-between">
+                <div class="d-flex align-items-center justify-content-between text-white-50 small mb-1">
+                  <span class="text-uppercase font-mono-audit" style="font-size: 10px;">Huella Carbono Total</span>
+                  <span class="p-1 rounded bg-secondary bg-opacity-15 text-secondary"><i class="bi bi-tree"></i></span>
+                </div>
+                <div class="d-flex align-items-baseline gap-1.5">
+                  <span class="font-metric text-secondary fs-3 fw-extrabold">14,285.74</span>
+                  <span class="font-mono-audit text-white-50 small">tCO2e</span>
+                </div>
+                <div class="d-flex align-items-center justify-content-between text-warning font-mono-audit mt-2" style="font-size: 11px;">
+                  <span>+1.2% vs 2025</span>
+                  <span class="text-muted">100% Determinista</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+              <div class="p-3.5 rounded-3 glass-card h-100 d-flex flex-column justify-content-between">
+                <div class="d-flex align-items-center justify-content-between text-white-50 small mb-1">
+                  <span class="text-uppercase font-mono-audit" style="font-size: 10px;">Alcance 1 (Directo)</span>
+                  <span class="p-1 rounded bg-primary bg-opacity-15 text-primary"><i class="bi bi-fire"></i></span>
+                </div>
+                <div class="d-flex align-items-baseline gap-1.5">
+                  <span class="font-metric text-white fs-3 fw-extrabold">8,920.12</span>
+                  <span class="font-mono-audit text-white-50 small">tCO2e</span>
+                </div>
+                <div class="font-mono-audit text-white-50 mt-2" style="font-size: 11px;">
+                  <span class="text-primary fw-bold">62.4%</span> del inventario total
+                </div>
+              </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+              <div class="p-3.5 rounded-3 glass-card h-100 d-flex flex-column justify-content-between">
+                <div class="d-flex align-items-center justify-content-between text-white-50 small mb-1">
+                  <span class="text-uppercase font-mono-audit" style="font-size: 10px;">Alcance 2 (Indirecto)</span>
+                  <span class="p-1 rounded bg-info bg-opacity-15 text-info"><i class="bi bi-lightning-charge"></i></span>
+                </div>
+                <div class="d-flex align-items-baseline gap-1.5">
+                  <span class="font-metric text-white fs-3 fw-extrabold">5,365.62</span>
+                  <span class="font-mono-audit text-white-50 small">tCO2e</span>
+                </div>
+                <div class="font-mono-audit text-white-50 mt-2" style="font-size: 11px;">
+                  <span class="text-info fw-bold">37.6%</span> factor grid UPME 2026
+                </div>
+              </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+              <div class="p-3.5 rounded-3 glass-card h-100 d-flex flex-column justify-content-between">
+                <div class="d-flex align-items-center justify-content-between text-white-50 small mb-1">
+                  <span class="text-uppercase font-mono-audit" style="font-size: 10px;">Balance Hídrico (m³)</span>
+                  <span class="p-1 rounded bg-secondary bg-opacity-15 text-secondary"><i class="bi bi-droplet"></i></span>
+                </div>
+                <div class="d-flex align-items-baseline gap-1.5">
+                  <span class="font-metric text-secondary fs-3 fw-extrabold">128,450.0</span>
+                  <span class="font-mono-audit text-white-50 small">m³</span>
+                </div>
+                <div class="font-mono-audit text-secondary mt-2 d-flex align-items-center gap-1" style="font-size: 11px;">
+                  <i class="bi bi-check-circle-fill"></i> Desbalance: 0.000 m³
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Analytical Split: Donut, Water bars, Evidences list -->
+          <div class="row g-4">
+            <!-- Donut -->
+            <div class="col-lg-4">
+              <div class="p-4 rounded-3 glass-card h-100 d-flex flex-column justify-content-between">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <span class="font-headline text-white small fw-bold">Desglose de Emisiones</span>
+                  <span class="font-mono-audit text-muted small">tCO2e</span>
+                </div>
+                <div class="position-relative d-flex align-items-center justify-content-center my-3">
+                  <svg width="150" height="150" viewBox="0 0 100 100" style="transform: rotate(-90deg);">
+                    <circle cx="50" cy="50" r="38" fill="transparent" stroke="#222a3d" stroke-width="12" />
+                    <circle cx="50" cy="50" r="38" fill="transparent" stroke="#4edea3" stroke-width="12" stroke-dasharray="149 239" stroke-linecap="round" />
+                    <circle cx="50" cy="50" r="38" fill="transparent" stroke="#3198dc" stroke-width="12" stroke-dasharray="90 239" stroke-dashoffset="-149" stroke-linecap="round" />
+                  </svg>
+                  <div class="position-absolute text-center">
+                    <span class="font-headline text-white fs-5 fw-bold d-block">14,285.7</span>
+                    <span class="font-mono-audit text-white-50" style="font-size: 10px;">Total tCO2e</span>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-between font-mono-audit text-white-50 small pt-2 border-top border-white-5">
+                  <span class="text-secondary fw-semibold">● Alcance 1 (62.4%)</span>
+                  <span class="text-primary fw-semibold">● Alcance 2 (37.6%)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Water Balance Bars -->
+            <div class="col-lg-4">
+              <div class="p-4 rounded-3 glass-card h-100 d-flex flex-column justify-content-between">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <span class="font-headline text-white small fw-bold">Balance Hídrico (m³)</span>
+                  <span class="badge bg-secondary bg-opacity-20 text-secondary border border-secondary border-opacity-30 font-mono-audit" style="font-size: 9px;">ISO 14046</span>
+                </div>
+                <div class="d-flex align-items-end justify-content-between px-3 pb-2" style="height: 140px;">
+                  <div class="d-flex flex-column align-items-center gap-1 w-25">
+                    <div class="w-100 d-flex flex-column-reverse rounded overflow-hidden bg-dark bg-opacity-50" style="height: 110px;">
+                      <div class="w-100 bg-secondary" style="height: 58%;"></div>
+                      <div class="w-100" style="height: 22%; background: #00a572;"></div>
+                      <div class="w-100 bg-primary" style="height: 12%;"></div>
+                      <div class="w-100 bg-warning" style="height: 8%;"></div>
+                    </div>
+                    <span class="font-mono-audit text-white-50" style="font-size: 10px;">Ene</span>
+                  </div>
+                  <div class="d-flex flex-column align-items-center gap-1 w-25">
+                    <div class="w-100 d-flex flex-column-reverse rounded overflow-hidden bg-dark bg-opacity-50" style="height: 95px;">
+                      <div class="w-100 bg-secondary" style="height: 52%;"></div>
+                      <div class="w-100" style="height: 26%; background: #00a572;"></div>
+                      <div class="w-100 bg-primary" style="height: 14%;"></div>
+                      <div class="w-100 bg-warning" style="height: 8%;"></div>
+                    </div>
+                    <span class="font-mono-audit text-white-50" style="font-size: 10px;">Feb</span>
+                  </div>
+                  <div class="d-flex flex-column align-items-center gap-1 w-25">
+                    <div class="w-100 d-flex flex-column-reverse rounded overflow-hidden bg-dark bg-opacity-50" style="height: 125px;">
+                      <div class="w-100 bg-secondary" style="height: 60%;"></div>
+                      <div class="w-100" style="height: 20%; background: #00a572;"></div>
+                      <div class="w-100 bg-primary" style="height: 12%;"></div>
+                      <div class="w-100 bg-warning" style="height: 8%;"></div>
+                    </div>
+                    <span class="font-mono-audit text-white-50" style="font-size: 10px;">Mar</span>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-between font-mono-audit text-white-50 pt-2 border-top border-white-5" style="font-size: 9px;">
+                  <span>Captación</span>
+                  <span>Consumo</span>
+                  <span>Descarga</span>
+                  <span>Pérdidas</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Evidence Chain of Custody -->
+            <div class="col-lg-4">
+              <div class="p-4 rounded-3 glass-card h-100 d-flex flex-column justify-content-between">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <span class="font-headline text-white small fw-bold">Trazabilidad de Evidencias</span>
+                  <span class="font-mono-audit text-secondary small"><i class="bi bi-shield-check"></i> ClamAV OK</span>
+                </div>
+                <div class="d-flex flex-column gap-2 my-2">
+                  <div class="d-flex align-items-center justify-content-between p-2 rounded-2 bg-dark bg-opacity-60 border border-white-5">
+                    <span class="text-truncate text-white small font-mono-audit" style="max-width: 170px;">factura_gas_enero_sedeA.pdf</span>
+                    <span class="badge bg-secondary bg-opacity-20 text-secondary border border-secondary border-opacity-30" style="font-size: 9px;">Validado</span>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-between p-2 rounded-2 bg-dark bg-opacity-60 border border-white-5">
+                    <span class="text-truncate text-white small font-mono-audit" style="max-width: 170px;">recibo_acueducto_q1.pdf</span>
+                    <span class="badge bg-secondary bg-opacity-20 text-secondary border border-secondary border-opacity-30" style="font-size: 9px;">Validado</span>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-between p-2 rounded-2 bg-dark bg-opacity-60 border border-white-5">
+                    <span class="text-truncate text-white small font-mono-audit" style="max-width: 170px;">cert_emisiones_alcance2.xlsx</span>
+                    <span class="badge bg-secondary bg-opacity-20 text-secondary border border-secondary border-opacity-30" style="font-size: 9px;">Validado</span>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-between font-mono-audit pt-2 border-top border-white-5 text-muted" style="font-size: 10px;">
+                  <span class="text-primary d-flex align-items-center gap-1"><i class="bi bi-lock-fill"></i> HTTP 423 Locked</span>
+                  <span>Ledger Block #8,941</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 2: STANDARDS & TRUST BADGES -->
+      <div class="w-100 py-5 bg-dark bg-opacity-40 border-top border-bottom border-white-5">
+        <div class="container" style="max-width: 1200px;">
+          <p class="font-mono-audit text-uppercase tracking-widest text-muted small mb-4 text-center">
+            Homologado para los más exigentes estándares globales y corporativos
+          </p>
+          <div class="row g-3 justify-content-center text-center">
+            <div class="col-6 col-md-4 col-lg-2">
+              <div class="p-3.5 rounded-3 glass-card h-100 d-flex flex-column align-items-center justify-content-center">
+                <i class="bi bi-file-earmark-check-fill text-primary fs-3 mb-2"></i>
+                <span class="font-headline text-white small fw-bold">GHG Protocol</span>
+                <span class="font-mono-audit text-muted" style="font-size: 10px;">Corporate Standard</span>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+              <div class="p-3.5 rounded-3 glass-card h-100 d-flex flex-column align-items-center justify-content-center">
+                <i class="bi bi-patch-check-fill text-secondary fs-3 mb-2"></i>
+                <span class="font-headline text-white small fw-bold">ISO 14064-1:2018</span>
+                <span class="font-mono-audit text-muted" style="font-size: 10px;">Gases Efecto Invernadero</span>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+              <div class="p-3.5 rounded-3 glass-card h-100 d-flex flex-column align-items-center justify-content-center">
+                <i class="bi bi-droplet-fill text-primary fs-3 mb-2"></i>
+                <span class="font-headline text-white small fw-bold">ISO 14046</span>
+                <span class="font-mono-audit text-muted" style="font-size: 10px;">Corporate Water Footprint</span>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+              <div class="p-3.5 rounded-3 glass-card h-100 d-flex flex-column align-items-center justify-content-center">
+                <i class="bi bi-shield-lock-fill text-secondary fs-3 mb-2"></i>
+                <span class="font-headline text-white small fw-bold">ISO 27001</span>
+                <span class="font-mono-audit text-muted" style="font-size: 10px;">InfoSec &amp; Criptografía</span>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+              <div class="p-3.5 rounded-3 glass-card h-100 d-flex flex-column align-items-center justify-content-center">
+                <i class="bi bi-file-earmark-lock2-fill text-primary fs-3 mb-2"></i>
+                <span class="font-headline text-white small fw-bold">GDPR / Ley 1581</span>
+                <span class="font-mono-audit text-muted" style="font-size: 10px;">Soberanía de Datos</span>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+              <div class="p-3.5 rounded-3 glass-card h-100 d-flex flex-column align-items-center justify-content-center">
+                <i class="bi bi-activity text-warning fs-3 mb-2"></i>
+                <span class="font-headline text-white small fw-bold">UPME &amp; DEFRA</span>
+                <span class="font-mono-audit text-muted" style="font-size: 10px;">Factores Oficiales 2026</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 3: SPREADSHEETS PAIN VS DETERMINISTIC CERTAINTY -->
+      <div class="container py-5" style="max-width: 1200px;">
+        <div class="text-center mb-5">
+          <span class="font-mono-audit text-danger text-uppercase tracking-wider small fw-bold">
+            Riesgo Corporativo &amp; Auditoría
+          </span>
+          <h2 class="font-display-lg text-white display-6 fw-bold mt-1">
+            El Fin de la Fragilidad en Hojas de Cálculo
+          </h2>
+          <p class="text-white-50 mx-auto small mt-2" style="max-width: 680px;">
+            Las empresas líderes no pueden sustentar sus compromisos Net-Zero ni sus declaraciones financieras no contables sobre libros de Excel dispersos y propensos a la corrupción.
+          </p>
+        </div>
+
+        <div class="row g-4">
+          <!-- Spreadsheets Pain Card -->
+          <div class="col-lg-6">
+            <div class="p-4 p-md-5 rounded-4 h-100 d-flex flex-column justify-content-between shadow-lg border border-danger border-opacity-30" style="background: rgba(147, 0, 10, 0.12); backdrop-filter: blur(16px);">
+              <div>
+                <div class="d-flex align-items-center gap-3 mb-4">
+                  <div class="p-2.5 rounded-3 bg-danger bg-opacity-25 text-danger fs-4">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-headline text-white fs-5 fw-bold mb-0">El Dolor de las Hojas de Cálculo Aisladas</h4>
+                    <span class="text-danger small font-semibold">Vulnerabilidad operativa y desvíos contables</span>
+                  </div>
+                </div>
+                <ul class="list-unstyled d-flex flex-column gap-3 text-start small text-white-50 mb-4">
+                  <li class="d-flex align-items-start gap-2.5">
+                    <span class="text-danger fw-bold fs-6 lh-1">✕</span>
+                    <span><strong>100 a 300+ horas por ciclo:</strong> Recopilación manual interminable, conciliaciones cruzadas en macros rotas y correos perdidos.</span>
+                  </li>
+                  <li class="d-flex align-items-start gap-2.5">
+                    <span class="text-danger fw-bold fs-6 lh-1">✕</span>
+                    <span><strong>Redondeo IEEE 754 con acumulación de error:</strong> Cálculos en punto flotante tradicional que introducen inconsistencias numéricas graves en auditoría forense.</span>
+                  </li>
+                  <li class="d-flex align-items-start gap-2.5">
+                    <span class="text-danger fw-bold fs-6 lh-1">✕</span>
+                    <span><strong>Archivos huérfanos sin trazabilidad:</strong> Cero bitácora de modificaciones. No hay forma fehaciente de comprobar quién alteró un factor o celda.</span>
+                  </li>
+                  <li class="d-flex align-items-start gap-2.5">
+                    <span class="text-danger fw-bold fs-6 lh-1">✕</span>
+                    <span><strong>Riesgo de sanciones y «Greenwashing»:</strong> Incapacidad de defender balances hídricos o emisiones ante entes reguladores bajo CSRD y SEC.</span>
+                  </li>
+                </ul>
+              </div>
+              <div class="p-3 rounded-3 bg-dark bg-opacity-60 border border-danger border-opacity-30 font-mono-audit small text-danger d-flex align-items-center gap-2">
+                <i class="bi bi-exclamation-octagon-fill"></i>
+                <span>Hallazgos recurrentes en auditorías Tipo II</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Solution Certainty Card -->
+          <div class="col-lg-6">
+            <div class="p-4 p-md-5 rounded-4 h-100 d-flex flex-column justify-content-between shadow-xl glass-panel border border-secondary border-opacity-30">
+              <div>
+                <div class="d-flex align-items-center gap-3 mb-4">
+                  <div class="p-2.5 rounded-3 bg-secondary bg-opacity-20 text-secondary fs-4">
+                    <i class="bi bi-shield-check"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-headline text-white fs-5 fw-bold mb-0">La Certeza Determinista de EFP Platform</h4>
+                    <span class="text-secondary small font-semibold">Rigor matemático, inmutabilidad y eficiencia</span>
+                  </div>
+                </div>
+                <ul class="list-unstyled d-flex flex-column gap-3 text-start small text-white-50 mb-4">
+                  <li class="d-flex align-items-start gap-2.5">
+                    <i class="bi bi-check-circle-fill text-secondary fs-6 shrink-0 mt-0.5"></i>
+                    <span><strong>Reducción ≥ 70% del tiempo de ciclo:</strong> Ingesta masiva automatizada con BullMQ, validación instantánea y reportería a un clic.</span>
+                  </li>
+                  <li class="d-flex align-items-start gap-2.5">
+                    <i class="bi bi-check-circle-fill text-secondary fs-6 shrink-0 mt-0.5"></i>
+                    <span><strong>Precisión matemática decimal.js a 6 decimales:</strong> Cero desvíos aritméticos; integridad numérica idéntica a los sistemas del sector bancario.</span>
+                  </li>
+                  <li class="d-flex align-items-start gap-2.5">
+                    <i class="bi bi-check-circle-fill text-secondary fs-6 shrink-0 mt-0.5"></i>
+                    <span><strong>Bitácora forense y sello SHA-256:</strong> Cada carga, enmienda y evidencia queda registrada con sello temporal, IP y usuario custodio.</span>
+                  </li>
+                  <li class="d-flex align-items-start gap-2.5">
+                    <i class="bi bi-check-circle-fill text-secondary fs-6 shrink-0 mt-0.5"></i>
+                    <span><strong>Bandeja de subsanación de errores en Staging:</strong> Si un lote trae errores de formato, se corrigen en interfaz antes del impacto contable oficial.</span>
+                  </li>
+                </ul>
+              </div>
+              <div class="p-3 rounded-3 bg-dark bg-opacity-60 border border-secondary border-opacity-30 font-mono-audit small text-secondary d-flex align-items-center gap-2">
+                <i class="bi bi-lock-fill"></i>
+                <span>100% de períodos auditables con HTTP 423 Lock</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 4: BENTO GRID CAPABILITIES -->
+      <div class="w-100 py-5 bg-dark bg-opacity-30">
+        <div class="container" style="max-width: 1200px;">
+          <div class="text-start mb-4">
+            <span class="font-mono-audit text-primary text-uppercase tracking-wider small fw-bold">
+              Arquitectura y Capacidades de Ingeniería
+            </span>
+            <h2 class="font-display-lg text-white display-6 fw-bold mt-1">
+              Construida para Resistir las Más Estrictas Inspecciones Forenses
+            </h2>
+          </div>
+
+          <div class="row g-3">
+            <!-- Card 1: Motor Determinista (7 cols) -->
+            <div class="col-lg-7">
+              <div class="glass-panel p-4 p-md-5 rounded-4 h-100 d-flex flex-column justify-content-between shadow-md">
+                <div>
+                  <div class="p-2 rounded-3 bg-primary bg-opacity-15 text-primary d-inline-flex fs-4 mb-3">
+                    <i class="bi bi-terminal-fill"></i>
+                  </div>
+                  <h4 class="font-headline text-white fs-5 fw-bold mb-2">
+                    Motor Determinista de Carbono (Alcances 1, 2 y 3)
+                  </h4>
+                  <p class="text-white-50 small mb-4">
+                    Biblioteca de factores de emisión homologados (UPME, DEFRA, IPCC, Ecoinvent) auditados anualmente. Cálculos deterministas sin desbordamiento de memoria ni redondeo flotante.
+                  </p>
+                </div>
+                <div class="p-3 rounded-3 bg-dark bg-opacity-80 border border-white-5 font-mono-audit small text-primary d-flex align-items-center justify-content-between flex-wrap gap-2">
+                  <code>const emissions = Decimal(activityData).mul(Decimal(emissionFactor));</code>
+                  <span class="text-secondary" style="font-size: 11px;">Precision: 6 decimals</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2: Balance Hídrico (5 cols) -->
+            <div class="col-lg-5">
+              <div class="glass-panel p-4 p-md-5 rounded-4 h-100 d-flex flex-column justify-content-between shadow-md">
+                <div>
+                  <div class="p-2 rounded-3 bg-secondary bg-opacity-15 text-secondary d-inline-flex fs-4 mb-3">
+                    <i class="bi bi-droplet-fill"></i>
+                  </div>
+                  <h4 class="font-headline text-white fs-5 fw-bold mb-2">
+                    Balance Hídrico y Conservación de Masa
+                  </h4>
+                  <p class="text-white-50 small mb-4">
+                    Reconciliación matemática estricta basada en el principio físico: Captación + Suministro = Descarga + Consumo + Pérdidas. Detección automática de fugas e integración con cuencas WRI Aqueduct.
+                  </p>
+                </div>
+                <div class="p-3 rounded-3 bg-dark bg-opacity-80 border border-white-5 font-mono-audit small text-secondary d-flex align-items-center justify-content-between">
+                  <code>ΔBalance = |(C + S) - (D + Q + P)| === 0.000000</code>
+                  <i class="bi bi-check-circle-fill"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 3: Ingesta Masiva BullMQ -->
+            <div class="col-md-4">
+              <div class="glass-panel p-4 rounded-4 h-100 d-flex flex-column justify-content-between shadow-sm">
+                <div>
+                  <div class="p-2 rounded-3 bg-primary bg-opacity-15 text-primary d-inline-flex fs-5 mb-3">
+                    <i class="bi bi-stack"></i>
+                  </div>
+                  <h5 class="font-headline text-white fs-6 fw-bold mb-2">Ingesta Masiva y Streaming</h5>
+                  <p class="text-white-50 small mb-0">
+                    Procesamiento de 100.000 registros en menos de 5 minutos mediante workers concurrentes de BullMQ con detección automática de duplicados por hash SHA-256.
+                  </p>
+                </div>
+                <div class="mt-4 font-mono-audit small text-white-50">
+                  <span class="text-secondary fw-bold">100k filas</span> en 4m 12s
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 4: Gobernanza HTTP 423 -->
+            <div class="col-md-4">
+              <div class="glass-panel p-4 rounded-4 h-100 d-flex flex-column justify-content-between shadow-sm">
+                <div>
+                  <div class="p-2 rounded-3 bg-warning bg-opacity-15 text-warning d-inline-flex fs-5 mb-3">
+                    <i class="bi bi-lock-fill"></i>
+                  </div>
+                  <h5 class="font-headline text-white fs-6 fw-bold mb-2">Gobernanza HTTP 423</h5>
+                  <p class="text-white-50 small mb-0">
+                    Mecanismo de sellado que bloquea cualquier mutación en la base de datos tras confirmación expresa. Si requiere subsanar posteriormente, se emite una Enmienda V2 con bifurcación rastreable.
+                  </p>
+                </div>
+                <div class="mt-4 font-mono-audit small text-warning">
+                  CONFIRMO_CIERRE_OFICIAL
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 5: Antivirus ClamAV & LUKS -->
+            <div class="col-md-4">
+              <div class="glass-panel p-4 rounded-4 h-100 d-flex flex-column justify-content-between shadow-sm">
+                <div>
+                  <div class="p-2 rounded-3 bg-secondary bg-opacity-15 text-secondary d-inline-flex fs-5 mb-3">
+                    <i class="bi bi-shield-check"></i>
+                  </div>
+                  <h5 class="font-headline text-white fs-6 fw-bold mb-2">Antivirus ClamAV &amp; LUKS</h5>
+                  <p class="text-white-50 small mb-0">
+                    Toda evidencia documental adjunta (facturas, lecturas) es analizada en tiempo real para descartar malware, y almacenada con cifrado local AES-256 en reposo.
+                  </p>
+                </div>
+                <div class="mt-4 font-mono-audit small text-secondary d-flex align-items-center gap-1.5">
+                  <i class="bi bi-check-circle-fill"></i> Zero Data Leakage Policy
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 5: STEPPED WORKFLOW -->
+      <div class="container py-5" style="max-width: 1200px;">
+        <div class="text-center mb-5">
+          <span class="font-mono-audit text-secondary text-uppercase tracking-wider small fw-bold">
+            Pipeline Operativo
+          </span>
+          <h2 class="font-display-lg text-white display-6 fw-bold mt-1">
+            Del Registro Crudo a la Certificación Oficial
+          </h2>
+          <p class="text-white-50 mx-auto small mt-2" style="max-width: 680px;">
+            Un proceso estructurado para eliminar la fricción entre los recolectores de datos en campo, los coordinadores de sostenibilidad y los auditores externos.
+          </p>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-md">
+            <div class="p-4 rounded-3 glass-card h-100 d-flex flex-column justify-content-between shadow-sm text-start">
+              <span class="font-mono-audit fs-2 fw-bold text-primary mb-2">01</span>
+              <h5 class="font-headline text-white fs-6 fw-bold mb-1">Límites &amp; Sedes</h5>
+              <p class="text-white-50 mb-0" style="font-size: 11px;">Definición del control operacional multitenant, sedes geográficas y asignación de responsables HSEQ.</p>
+            </div>
+          </div>
+          <div class="col-md">
+            <div class="p-4 rounded-3 glass-card h-100 d-flex flex-column justify-content-between shadow-sm text-start">
+              <span class="font-mono-audit fs-2 fw-bold text-primary mb-2">02</span>
+              <h5 class="font-headline text-white fs-6 fw-bold mb-1">Ingesta Masiva</h5>
+              <p class="text-white-50 mb-0" style="font-size: 11px;">Carga por lotes de CSV/Excel o integración IoT/ERP, adjuntando la factura o soporte probatorio.</p>
+            </div>
+          </div>
+          <div class="col-md">
+            <div class="p-4 rounded-3 glass-card h-100 d-flex flex-column justify-content-between shadow-sm text-start">
+              <span class="font-mono-audit fs-2 fw-bold text-primary mb-2">03</span>
+              <h5 class="font-headline text-white fs-6 fw-bold mb-1">Staging &amp; Limpieza</h5>
+              <p class="text-white-50 mb-0" style="font-size: 11px;">Filtrado y subsanación en pantalla de valores anómalos o factores no encontrados sin romper la base contable.</p>
+            </div>
+          </div>
+          <div class="col-md">
+            <div class="p-4 rounded-3 glass-card h-100 d-flex flex-column justify-content-between shadow-sm text-start">
+              <span class="font-mono-audit fs-2 fw-bold text-primary mb-2">04</span>
+              <h5 class="font-headline text-white fs-6 fw-bold mb-1">Revisión HSEQ</h5>
+              <p class="text-white-50 mb-0" style="font-size: 11px;">Verificación del cuadre de conservación de agua, factores aplicados e inspección visual de comprobantes.</p>
+            </div>
+          </div>
+          <div class="col-md">
+            <div class="p-4 rounded-3 glass-card h-100 d-flex flex-column justify-content-between shadow-sm text-start">
+              <span class="font-mono-audit fs-2 fw-bold text-primary mb-2">05</span>
+              <h5 class="font-headline text-white fs-6 fw-bold mb-1">Sellado SHA-256</h5>
+              <p class="text-white-50 mb-0" style="font-size: 11px;">Cierre definitivo de período (HTTP 423), generación de reportes ejecutivos en PDF/XLSX listos para auditor.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 6: METRICS & TESTIMONIAL -->
+      <div class="w-100 py-5 bg-dark bg-opacity-50 border-top border-bottom border-white-5">
+        <div class="container" style="max-width: 1200px;">
+          <!-- 4 Stat Metrics -->
+          <div class="row g-4 text-center mb-5">
+            <div class="col-6 col-lg-3">
+              <div class="p-4 rounded-4 glass-card h-100">
+                <span class="font-metric text-secondary display-5 fw-extrabold">99.85%</span>
+                <p class="text-white-50 small mt-2 mb-0">Factores Homologados Automáticamente</p>
+              </div>
+            </div>
+            <div class="col-6 col-lg-3">
+              <div class="p-4 rounded-4 glass-card h-100">
+                <span class="font-metric text-primary display-5 fw-extrabold">-70%</span>
+                <p class="text-white-50 small mt-2 mb-0">Tiempo de Cierre de Inventario Anual</p>
+              </div>
+            </div>
+            <div class="col-6 col-lg-3">
+              <div class="p-4 rounded-4 glass-card h-100">
+                <span class="font-metric text-secondary display-5 fw-extrabold">0</span>
+                <p class="text-white-50 small mt-2 mb-0">Hallazgos en Auditorías Externas</p>
+              </div>
+            </div>
+            <div class="col-6 col-lg-3">
+              <div class="p-4 rounded-4 glass-card h-100">
+                <span class="font-metric text-primary display-5 fw-extrabold">50+</span>
+                <p class="text-white-50 small mt-2 mb-0">Sedes Industriales Conectadas</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Testimonial Glass Card with Elena Valencia -->
+          <div class="p-4 p-md-5 rounded-4 glass-panel shadow-xl border border-white-15">
+            <div class="d-flex flex-column flex-lg-row align-items-center gap-4 text-center text-lg-start">
+              <div class="position-relative flex-shrink-0">
+                <img src="https://lh3.googleusercontent.com/aida/AEtjO1U8NJzip9adBozwhrpWLAwhscCkyoKK_vGkOHCAPcD6xsQGTM9DtxXdMTr4yEuxsTbutLGa1k1qOuvH1zNNhfrG81-Zg90NGjI-nXuG1e0QtCI0cwGOCEM59H1p8cYyNJMjfVupqNA2mw5LyxC8Ukra2b9x4Zhqu4LsBnMtaslUUfsrtUzOSrJ2ImMUKBSpZzIYpVwE_3J-IjT_bPTLILJJ93rodoQGAuiG_Q3SDsmBKSFTVQC60T_yHCY" 
+                     alt="Directora de Sostenibilidad y Cumplimiento HSEQ" 
+                     width="120" height="120" 
+                     class="rounded-circle object-fit-cover shadow-lg border border-primary border-opacity-40" />
+              </div>
+              <div>
+                <div class="d-flex align-items-center justify-content-center justify-content-lg-start gap-1 text-warning mb-2">
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                </div>
+                <blockquote class="font-headline fs-6 text-white fst-italic leading-relaxed mb-3">
+                  “Antes de EFP Platform, defender el balance de captación de agua y las emisiones de Alcance 1 ante auditores de ICONTEC nos tomaba semanas buscando archivos en carpetas de red. Con el sellado inmutable y las evidencias enlazadas al ledger SHA-256, cerramos nuestra auditoría en tiempo récord y con cero no conformidades.”
+                </blockquote>
+                <div>
+                  <span class="font-headline text-white small fw-bold d-block">Ing. Elena Valencia C.</span>
+                  <span class="text-secondary small fw-semibold">
+                    Directora Corporativa de Sostenibilidad &amp; HSEQ • Grupo Industrial Andino
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 7: FINAL CTA & DEMO FORM -->
+      <div class="container py-5" style="max-width: 1200px;" id="demo-section">
+        <div class="rounded-4 glass-modal p-4 p-md-5 shadow-2xl border border-white-15">
+          <div class="row align-items-center g-5">
+            <!-- Left Info -->
+            <div class="col-lg-6 text-start">
+              <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-dark bg-opacity-60 border border-secondary border-opacity-30 text-secondary font-mono-audit small mb-3">
+                <i class="bi bi-shield-check"></i> AUDITORÍA SIN RIESGOS
+              </div>
+              <h2 class="font-display-lg text-white display-6 fw-bold mb-3">
+                Transforme su inventario ambiental en un activo de certeza contable.
+              </h2>
+              <p class="text-white-50 small mb-4 leading-relaxed">
+                Nuestros ingenieros de soluciones le mostrarán cómo migrar sus planillas actuales a un entorno determinista con soporte forense y backend en Supabase.
+              </p>
+              <div class="d-flex flex-column gap-2 text-white-50 small font-mono-audit">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-check-circle-fill text-secondary"></i>
+                  <span>Demostración con su propio set de datos o dataset de prueba</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-check-circle-fill text-secondary"></i>
+                  <span>Evaluación de conformidad con ISO 14064 &amp; ISO 14046 sin costo</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-check-circle-fill text-secondary"></i>
+                  <span>Base de datos PostgreSQL en Supabase con RLS y cifrado en reposo</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Form -->
+            <div class="col-lg-6">
+              <div class="glass-card p-4 p-md-4 rounded-4 shadow-lg border border-white-10 text-start">
+                <h4 class="font-headline text-white fs-6 fw-bold mb-3">
+                  Solicitar Demostración Técnica Personalizada
+                </h4>
+
+                <form id="form-demo-request">
+                  <div class="mb-3">
+                    <label class="form-label text-white-50 small fw-semibold">Empresa / Razón Social *</label>
+                    <input type="text" id="demo-empresa" class="form-control form-control-efp" placeholder="Ej. Minera del Pacífico S.A." required />
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label text-white-50 small fw-semibold">Correo Electrónico Corporativo *</label>
+                    <input type="email" id="demo-correo" class="form-control form-control-efp" placeholder="hseq@empresa.com" required />
+                  </div>
+
+                  <div class="row g-2 mb-3">
+                    <div class="col-sm-6">
+                      <label class="form-label text-white-50 small fw-semibold">Sedes Operativas</label>
+                      <select id="demo-sedes" class="form-select form-select-efp">
+                        <option value="1-5">1 a 5 Sedes</option>
+                        <option value="6-20">6 a 20 Sedes</option>
+                        <option value="20+">&gt; 20 Sedes (Enterprise)</option>
+                      </select>
+                    </div>
+                    <div class="col-sm-6">
+                      <label class="form-label text-white-50 small fw-semibold">Enfoque Principal</label>
+                      <select id="demo-enfoque" class="form-select form-select-efp">
+                        <option value="both">Carbono + Agua Integrados</option>
+                        <option value="carbon">Solo Huella de Carbono</option>
+                        <option value="water">Solo Balance Hídrico (ISO 14046)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <button type="submit" class="btn btn-efp-primary w-100 py-2.5 font-headline small d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-send-fill"></i>
+                    <span>Solicitar Demo Personalizada</span>
+                  </button>
+
+                  <div id="demo-success-alert" class="p-2.5 rounded-3 bg-secondary bg-opacity-15 text-secondary small font-mono-audit mt-3 border border-secondary border-opacity-30 d-none">
+                    <i class="bi bi-check-circle-fill me-1"></i> ¡Solicitud almacenada con éxito en Supabase! Un auditor técnico responderá en breve.
+                  </div>
+
+                  <p class="text-white-50 text-center font-mono-audit mt-3 mb-0" style="font-size: 10px;">
+                    Sus datos están protegidos bajo ISO 27001 y Ley 1581. Persistencia segura en Supabase.
+                  </p>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- 2. VIEW: LOGIN -->
+    <section id="view-login" class="view-container">
+      <div class="container py-4 py-lg-5">
+        <div class="row align-items-center g-5 max-w-5xl mx-auto">
+          
+          <!-- Left Column: Trust Matrix -->
+          <div class="col-lg-6">
+            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-dark bg-opacity-60 border border-white-10 mb-3">
+              <span class="pulse-dot bg-secondary"></span>
+              <span class="font-mono-audit text-primary small fw-semibold">SISTEMA DETERMINISTA • ISO 14064 / 14046</span>
+            </div>
+            <h1 class="font-headline text-white display-5 fw-extrabold mb-3">
+              Cálculo de Huella Hídrica y <br />
+              <span class="text-transparent bg-clip-text" style="background: linear-gradient(90deg, #93ccff, #3198dc, #4edea3); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                Huella de Carbono
+              </span>
+            </h1>
+            <p class="text-white-50 mb-4">
+              Plataforma enterprise para contabilidad ambiental determinista, verificación técnica HSEQ y gobernanza de datos conectada a Supabase PostgreSQL.
+            </p>
+
+            <div class="p-3.5 rounded-3 glass-card border border-white-10 mb-3">
+              <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-shield-check text-secondary fs-3"></i>
+                <div>
+                  <h6 class="text-white font-headline mb-0">Aseguramiento de Datos Auditables</h6>
+                  <span class="text-white-50 small">Cálculos con decimal.js para prevenir desvíos en números de punto flotante IEEE 754.</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3.5 rounded-3 glass-card border border-white-10">
+              <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-fingerprint text-primary fs-3"></i>
+                <div>
+                  <h6 class="text-white font-headline mb-0">Custodia Criptográfica en Ledger</h6>
+                  <span class="text-white-50 small">Cada período cerrado se sella con Merkle tree y SHA-256 en tablas inmutables de Supabase.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Login Glass Card -->
+          <div class="col-lg-6">
+            <div class="glass-panel p-4 p-sm-5 rounded-4 shadow-2xl border border-white-15">
+              <div class="d-flex align-items-center justify-content-between pb-3 border-bottom border-white-10 mb-4">
+                <div>
+                  <h4 class="font-headline text-white mb-0">Autenticación Segura</h4>
+                  <span class="text-white-50 small">Ingrese sus credenciales corporativas</span>
+                </div>
+                <button type="button" id="btn-fill-admin-creds" class="btn btn-sm btn-outline-info font-mono-audit small" title="Cargar credenciales por defecto (admin / 123123)">
+                  <i class="bi bi-magic me-1"></i> Auto-llenar Demo
+                </button>
+              </div>
+
+              <form id="form-login">
+                <div class="mb-3">
+                  <label class="form-label text-white-50 small fw-semibold">Usuario o Correo Corporativo</label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-dark bg-opacity-70 border-white-10 text-white-50"><i class="bi bi-person"></i></span>
+                    <input type="text" id="login-usuario" class="form-control form-control-efp" placeholder="admin" value="admin" required />
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label text-white-50 small fw-semibold">Contraseña</label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-dark bg-opacity-70 border-white-10 text-white-50"><i class="bi bi-lock"></i></span>
+                    <input type="password" id="login-password" class="form-control form-control-efp" placeholder="••••••••" value="123123" required />
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label text-white-50 small fw-semibold">Sede Operativa Asignada</label>
+                  <select class="form-select form-select-efp" id="login-sede">
+                    <option value="multi-global" selected>Multi-Sede Global (Todas las instalaciones)</option>
+                    <option value="CL-SCL-01">CL-SCL-01 - Campus Central y Labs</option>
+                    <option value="CL-QLC-02">CL-QLC-02 - Planta Quilicura Manuf.</option>
+                    <option value="CO-MED-04">CO-MED-04 - Centro Logístico Buenaventura</option>
+                  </select>
+                </div>
+
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                  <div class="form-check">
+                    <input class="form-check-input bg-dark border-white-20" type="checkbox" id="rememberMe" checked />
+                    <label class="form-check-label text-white-50 small" for="rememberMe">Recordar sesión</label>
+                  </div>
+                  <span class="text-secondary small font-mono-audit"><i class="bi bi-shield-check"></i> MFA Requerido</span>
+                </div>
+
+                <button type="submit" class="btn btn-efp-primary w-100 py-2.5 font-headline small">
+                  <i class="bi bi-box-arrow-in-right me-2"></i> Iniciar Sesión en la Plataforma
+                </button>
+              </form>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. VIEW: EXECUTIVE DASHBOARD -->
+    <section id="view-dashboard" class="view-container active-view">
+      <div class="container-fluid px-3 px-sm-4 px-xl-5">
+
+        <!-- Executive Ribbon Filter Bar -->
+        <div class="d-flex flex-column flex-xl-row align-items-start align-items-xl-center justify-content-between gap-3 p-4 rounded-4 glass-panel mb-4">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <span class="font-mono-audit text-primary text-uppercase fw-bold small">Consolidado Corporativo ISO 14064 / 14046</span>
+              <span class="text-muted">•</span>
+              <span class="font-mono-audit text-white-50 small">Sede Global Multi-Sitio</span>
+            </div>
+            <h2 class="font-headline text-white fs-4 fw-bold mb-0">Resumen de Huella Ambiental Organizacional</h2>
+          </div>
+
+          <!-- Controls Group -->
+          <div class="d-flex flex-wrap align-items-center gap-2.5">
+            <!-- Review status pill -->
+            <div class="badge-pill-status badge-pill-warning">
+              <span class="pulse-dot bg-warning"></span>
+              <span>En Revisión HSEQ</span>
+            </div>
+
+            <!-- Cycle version -->
+            <div class="px-3 py-1.5 rounded-3 bg-dark bg-opacity-50 border border-white-10 font-mono-audit small">
+              <span class="text-muted">Ciclo: </span>
+              <span class="text-secondary fw-bold">2026-ANUAL (v1)</span>
+            </div>
+
+            <!-- Facility Selector -->
+            <select id="select-dashboard-facility" class="form-select form-select-sm form-select-efp" style="min-width: 210px;">
+              <option value="all" selected>Todas las Sedes (50 activas)</option>
+              <option value="hq">Campus Central - Santiago</option>
+              <option value="planta1">Planta Industrial Quilicura</option>
+              <option value="logistica">Centro Logístico Buenaventura</option>
+            </select>
+
+            <!-- PDF Export Action Button -->
+            <button id="btn-download-pdf" class="btn btn-sm btn-efp-primary d-inline-flex align-items-center gap-1.5 px-3 py-1.5">
+              <i class="bi bi-file-earmark-pdf-fill"></i>
+              <span>Descargar Resumen Ejecutivo PDF</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 Bento KPI Metric Cards -->
+        <div class="row g-3 mb-4">
+          
+          <!-- KPI 1: Carbon Footprint Total -->
+          <div class="col-sm-6 col-xl-3">
+            <div class="glass-card p-4 h-100 position-relative overflow-hidden">
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-white-50 small fw-semibold">Huella de Carbono Total</span>
+                <div class="p-2 rounded-3 bg-secondary bg-opacity-15 text-secondary">
+                  <i class="bi bi-tree-fill fs-5"></i>
+                </div>
+              </div>
+              <div class="d-flex align-items-baseline gap-2">
+                <span id="kpi-carbono-total" class="font-metric text-white display-6 fw-extrabold tracking-tight">14,285.74</span>
+                <span class="font-mono-audit text-white-50 small">tCO2e</span>
+              </div>
+              <div class="d-flex align-items-center justify-content-between mt-3 small font-mono-audit">
+                <span class="text-warning"><i class="bi bi-graph-up-arrow me-1"></i>+1.2% vs 2025</span>
+                <span class="text-muted">GWP IPCC AR6</span>
+              </div>
+              <div class="position-absolute bottom-0 start-0 end-0" style="height: 3px; background: linear-gradient(90deg, #4edea3, #00a572);"></div>
+            </div>
+          </div>
+
+          <!-- KPI 2: Direct Scope 1 -->
+          <div class="col-sm-6 col-xl-3">
+            <div class="glass-card p-4 h-100 position-relative overflow-hidden">
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-white-50 small fw-semibold">Alcance 1 (Directo)</span>
+                <div class="p-2 rounded-3 bg-primary bg-opacity-15 text-primary">
+                  <i class="bi bi-buildings-fill fs-5"></i>
+                </div>
+              </div>
+              <div class="d-flex align-items-baseline gap-2">
+                <span id="kpi-alcance-1" class="font-metric text-white display-6 fw-extrabold tracking-tight">8,920.12</span>
+                <span class="font-mono-audit text-white-50 small">tCO2e</span>
+              </div>
+              <div class="d-flex align-items-center justify-content-between mt-3 small font-mono-audit">
+                <span id="kpi-alcance-1-pct" class="text-secondary fw-bold">62.4% del inventario</span>
+                <span class="text-muted">Fijos & Móviles</span>
+              </div>
+              <div class="position-absolute bottom-0 start-0 end-0" style="height: 3px; background: linear-gradient(90deg, #93ccff, #3198dc);"></div>
+            </div>
+          </div>
+
+          <!-- KPI 3: Indirect Scope 2 -->
+          <div class="col-sm-6 col-xl-3">
+            <div class="glass-card p-4 h-100 position-relative overflow-hidden">
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-white-50 small fw-semibold">Alcance 2 (Indirecto)</span>
+                <div class="p-2 rounded-3 bg-info bg-opacity-15 text-info">
+                  <i class="bi bi-lightning-charge-fill fs-5"></i>
+                </div>
+              </div>
+              <div class="d-flex align-items-baseline gap-2">
+                <span id="kpi-alcance-2" class="font-metric text-white display-6 fw-extrabold tracking-tight">5,365.62</span>
+                <span class="font-mono-audit text-white-50 small">tCO2e</span>
+              </div>
+              <div class="d-flex align-items-center justify-content-between mt-3 small font-mono-audit">
+                <span id="kpi-alcance-2-pct" class="text-primary fw-bold">37.6% (Base de Red)</span>
+                <span class="text-muted">Market-based</span>
+              </div>
+              <div class="position-absolute bottom-0 start-0 end-0" style="height: 3px; background: linear-gradient(90deg, #3198dc, #006398);"></div>
+            </div>
+          </div>
+
+          <!-- KPI 4: Water Balance -->
+          <div class="col-sm-6 col-xl-3">
+            <div class="glass-card p-4 h-100 position-relative overflow-hidden">
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-white-50 small fw-semibold">Consumo Total de Agua</span>
+                <div class="p-2 rounded-3 bg-secondary bg-opacity-15 text-secondary">
+                  <i class="bi bi-droplet-fill fs-5"></i>
+                </div>
+              </div>
+              <div class="d-flex align-items-baseline gap-2">
+                <span id="kpi-agua-total" class="font-metric text-secondary display-6 fw-extrabold tracking-tight">128,450.0</span>
+                <span class="font-mono-audit text-white-50 small">m³</span>
+              </div>
+              <div class="d-flex align-items-center justify-content-between mt-3 small font-mono-audit">
+                <span class="text-secondary"><i class="bi bi-graph-down-arrow me-1"></i>-2.5% vs 2025</span>
+                <span id="kpi-agua-desbalance" class="badge bg-secondary bg-opacity-20 text-secondary border border-secondary border-opacity-30">Desbalance: 0.000 m³</span>
+              </div>
+              <div class="position-absolute bottom-0 start-0 end-0" style="height: 3px; background: linear-gradient(90deg, #00a572, #4edea3);"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 3-Column Split: Visualizations and Ledger -->
+        <div class="row g-4 mb-4">
+          
+          <!-- Column 1: Carbon Scope Donut Chart -->
+          <div class="col-xl-4">
+            <div class="glass-panel p-4 rounded-4 shadow-lg h-100 d-flex flex-col justify-content-between">
+              <div>
+                <div class="d-flex align-items-center justify-content-between pb-3 border-bottom border-white-10 mb-3">
+                  <div>
+                    <h5 class="font-headline text-white mb-0">Desglose de Emisiones (tCO2e)</h5>
+                    <span class="text-white-50 small">Alcance 1 y 2 según GHG Protocol</span>
+                  </div>
+                  <i class="bi bi-info-circle text-muted" title="Auditado bajo estándares GHG Protocol"></i>
+                </div>
+
+                <!-- SVG Donut Chart with Centered Metric -->
+                <div class="position-relative d-flex align-items-center justify-content-center my-4">
+                  <svg class="donut-svg" width="200" height="200" viewBox="0 0 160 160" style="transform: rotate(-90deg);">
+                    <!-- Background Ring -->
+                    <circle cx="80" cy="80" r="62" fill="none" stroke="#131b2e" stroke-width="16" />
+                    <!-- Scope 1 Ring (#4edea3) -->
+                    <circle id="donut-ring-scope1" class="donut-ring" cx="80" cy="80" r="62" fill="none" stroke="#4edea3" stroke-width="16" stroke-dasharray="243 389.5" stroke-dashoffset="0" stroke-linecap="round" />
+                    <!-- Scope 2 Ring (#93ccff) -->
+                    <circle id="donut-ring-scope2" class="donut-ring" cx="80" cy="80" r="62" fill="none" stroke="#93ccff" stroke-width="16" stroke-dasharray="146.5 389.5" stroke-dashoffset="-243" stroke-linecap="round" />
+                  </svg>
+                  
+                  <div class="position-absolute top-50 start-50 translate-middle text-center pointer-events-none">
+                    <span class="font-mono-audit text-white-50 small text-uppercase d-block" style="font-size: 10px;">Inventario Total</span>
+                    <span id="donut-total-text" class="font-headline text-white fs-4 fw-bold d-block">14,285.7</span>
+                    <span class="font-mono-audit text-secondary small fw-bold">tCO2e Total</span>
+                  </div>
+                </div>
+
+                <!-- Scope Breakdown Cards -->
+                <div class="d-flex flex-column gap-2 mb-3">
+                  <div class="d-flex align-items-center justify-content-between p-2.5 rounded-3 bg-dark bg-opacity-60 border border-white-5">
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="rounded-circle d-inline-block" style="width: 10px; height: 10px; background: #4edea3;"></span>
+                      <div>
+                        <div class="text-white small fw-bold">Alcance 1 (62.4%)</div>
+                        <div class="text-muted" style="font-size: 11px;">Combustibles Fijos y Flota Móvil</div>
+                      </div>
+                    </div>
+                    <div class="text-end">
+                      <div class="font-mono-audit text-white small fw-bold">8,920.12 t</div>
+                      <div class="text-secondary fw-semibold" style="font-size: 10px;">Validado</div>
+                    </div>
+                  </div>
+
+                  <div class="d-flex align-items-center justify-content-between p-2.5 rounded-3 bg-dark bg-opacity-60 border border-white-5">
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="rounded-circle d-inline-block" style="width: 10px; height: 10px; background: #93ccff;"></span>
+                      <div>
+                        <div class="text-white small fw-bold">Alcance 2 (37.6%)</div>
+                        <div class="text-muted" style="font-size: 11px;">Consumo de Red Eléctrica</div>
+                      </div>
+                    </div>
+                    <div class="text-end">
+                      <div class="font-mono-audit text-white small fw-bold">5,365.62 t</div>
+                      <div class="text-primary fw-semibold" style="font-size: 10px;">Validado</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Subcategories Grid -->
+                <div class="row g-2 font-mono-audit small">
+                  <div class="col-6">
+                    <div class="p-2 rounded-2 bg-dark bg-opacity-40 border border-white-5 d-flex justify-content-between">
+                      <span class="text-muted">Comb. Fijos</span>
+                      <strong id="donut-sub-fijos" class="text-white">5,100 t</strong>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="p-2 rounded-2 bg-dark bg-opacity-40 border border-white-5 d-flex justify-content-between">
+                      <span class="text-muted">Flota Móvil</span>
+                      <strong id="donut-sub-movil" class="text-white">3,420 t</strong>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="p-2 rounded-2 bg-dark bg-opacity-40 border border-white-5 d-flex justify-content-between">
+                      <span class="text-muted">Refrigerantes</span>
+                      <strong id="donut-sub-refri" class="text-white">400.1 t</strong>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="p-2 rounded-2 bg-dark bg-opacity-40 border border-white-5 d-flex justify-content-between">
+                      <span class="text-muted">Electricidad</span>
+                      <strong id="donut-sub-elec" class="text-white">5,365 t</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pt-3 border-top border-white-10 mt-3 d-flex justify-content-between small text-muted font-mono-audit">
+                <span>GHG Corporate v4</span>
+                <span class="text-secondary fw-semibold">Ledger ID #0029-A</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 2: Water Balance ISO 14046 -->
+          <div class="col-xl-4">
+            <div class="glass-panel p-4 rounded-4 shadow-lg h-100 d-flex flex-col justify-content-between">
+              <div>
+                <div class="d-flex align-items-center justify-content-between pb-3 border-bottom border-white-10 mb-3">
+                  <div>
+                    <h5 class="font-headline text-white mb-0">Balance Hídrico (m³)</h5>
+                    <span class="text-white-50 small">Conservación de Masa: Inflow = Outflow</span>
+                  </div>
+                  <span class="badge-pill-status badge-pill-verified">
+                    Equilibrio OK
+                  </span>
+                </div>
+
+                <!-- Water Legend -->
+                <div class="d-flex flex-wrap gap-2.5 small text-white-50 mb-3 font-mono-audit">
+                  <span class="d-inline-flex align-items-center gap-1"><span class="d-inline-block rounded-1" style="width: 8px; height: 8px; background: #4edea3;"></span> Captación</span>
+                  <span class="d-inline-flex align-items-center gap-1"><span class="d-inline-block rounded-1" style="width: 8px; height: 8px; background: #00a572;"></span> Consumo</span>
+                  <span class="d-inline-flex align-items-center gap-1"><span class="d-inline-block rounded-1" style="width: 8px; height: 8px; background: #93ccff;"></span> Descarga</span>
+                  <span class="d-inline-flex align-items-center gap-1"><span class="d-inline-block rounded-1" style="width: 8px; height: 8px; background: #ffb95f;"></span> Pérdidas</span>
+                </div>
+
+                <!-- Water Progress Stacked per Trimester -->
+                <div class="d-flex flex-column gap-3 mb-4">
+                  <!-- Q1 -->
+                  <div>
+                    <div class="d-flex justify-content-between font-mono-audit small mb-1">
+                      <span class="text-secondary fw-bold">Trimestre 1 (Q1)</span>
+                      <span class="text-white-50">42,800.0 m³ totales</span>
+                    </div>
+                    <div class="water-progress-stacked" title="Captación 45%, Consumo 30%, Descarga 20%, Pérdidas 5%">
+                      <div class="water-segment bg-secondary" style="width: 45%;"></div>
+                      <div class="water-segment" style="width: 30%; background: #00a572;"></div>
+                      <div class="water-segment bg-primary" style="width: 20%;"></div>
+                      <div class="water-segment bg-warning" style="width: 5%;"></div>
+                    </div>
+                  </div>
+
+                  <!-- Q2 -->
+                  <div>
+                    <div class="d-flex justify-content-between font-mono-audit small mb-1">
+                      <span class="text-secondary fw-bold">Trimestre 2 (Q2)</span>
+                      <span class="text-white-50">43,150.0 m³ totales</span>
+                    </div>
+                    <div class="water-progress-stacked" title="Captación 44%, Consumo 32%, Descarga 19%, Pérdidas 5%">
+                      <div class="water-segment bg-secondary" style="width: 44%;"></div>
+                      <div class="water-segment" style="width: 32%; background: #00a572;"></div>
+                      <div class="water-segment bg-primary" style="width: 19%;"></div>
+                      <div class="water-segment bg-warning" style="width: 5%;"></div>
+                    </div>
+                  </div>
+
+                  <!-- Q3 -->
+                  <div>
+                    <div class="d-flex justify-content-between font-mono-audit small mb-1">
+                      <span class="text-secondary fw-bold">Trimestre 3 (Q3)</span>
+                      <span class="text-white-50">42,500.0 m³ totales</span>
+                    </div>
+                    <div class="water-progress-stacked" title="Captación 46%, Consumo 29%, Descarga 21%, Pérdidas 4%">
+                      <div class="water-segment bg-secondary" style="width: 46%;"></div>
+                      <div class="water-segment" style="width: 29%; background: #00a572;"></div>
+                      <div class="water-segment bg-primary" style="width: 21%;"></div>
+                      <div class="water-segment bg-warning" style="width: 4%;"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Water Stress Card -->
+                <div class="p-3 rounded-3 bg-dark bg-opacity-60 border border-white-10">
+                  <div class="d-flex align-items-center justify-content-between mb-1">
+                    <span class="text-white small fw-bold">Análisis de Estrés Hídrico de Cuenca</span>
+                    <span class="badge bg-primary bg-opacity-15 text-primary border border-primary border-opacity-30 small font-mono-audit">WRI Aqueduct 4.0</span>
+                  </div>
+                  <p class="text-white-50 small mb-2">
+                    El 68% de las extracciones provienen de cuencas en nivel de estrés bajo a medio. No se detectan contingencias en vertimientos.
+                  </p>
+                  <div class="d-flex align-items-center gap-3 font-mono-audit small">
+                    <span class="text-secondary fw-bold">Tasa Reúso: 28.4%</span>
+                    <span class="text-muted">|</span>
+                    <span class="text-white">Vertimiento DBO: Conforme</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pt-3 border-top border-white-10 mt-3 d-flex justify-content-between small text-muted font-mono-audit">
+                <span>Auditoría de Medidores Telemétricos</span>
+                <span class="text-secondary fw-medium">100% Sin Desfase</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 3: Traceability & ClamAV Evidences -->
+          <div class="col-xl-4 d-flex flex-column gap-3">
+            
+            <!-- Ingestion Traceability Box -->
+            <div class="glass-panel p-4 rounded-4 shadow-lg flex-grow-1">
+              <div class="d-flex align-items-center justify-content-between pb-2 border-bottom border-white-10 mb-3">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-fingerprint text-primary fs-5"></i>
+                  <h6 class="font-headline text-white mb-0">Trazabilidad de Ingesta</h6>
+                </div>
+                <span class="font-mono-audit text-muted small">SHA-256</span>
+              </div>
+              <div id="container-trazabilidad">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+
+            <!-- Recent Evidences Box -->
+            <div class="glass-panel p-4 rounded-4 shadow-lg flex-grow-1">
+              <div class="d-flex align-items-center justify-content-between pb-2 border-bottom border-white-10 mb-3">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-shield-check text-secondary fs-5"></i>
+                  <h6 class="font-headline text-white mb-0">Evidencias Custodiadas</h6>
+                </div>
+                <span class="badge-pill-status badge-pill-verified small">ClamAV Limpio</span>
+              </div>
+              <div id="container-evidencias">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Facilities Monitored Table -->
+        <div class="glass-panel p-4 rounded-4 shadow-lg">
+          <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3 mb-3">
+            <div>
+              <h5 class="font-headline text-white mb-1">Monitoreo de Sedes Operativas Críticas</h5>
+              <span class="text-white-50 small">Estado del cierre hídrico y de emisiones por complejo industrial y administrativo</span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+              <span class="font-mono-audit text-secondary small fw-bold">● 50/50 Sedes en Cumplimiento</span>
+              <button class="btn btn-sm btn-efp-glass font-headline small" data-view="sedes">
+                Ver Todas las Sedes <i class="bi bi-arrow-right ms-1"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-efp">
+              <thead>
+                <tr>
+                  <th>Código Sede</th>
+                  <th>Nombre Complejo</th>
+                  <th>Tipo Instalación</th>
+                  <th class="text-end">Huella Carbono</th>
+                  <th class="text-end">Balance Hídrico</th>
+                  <th class="text-center">Auditoría HSEQ</th>
+                  <th class="text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-sedes-dashboard">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 4. VIEW: CARGA MASIVA (BULK INGEST) -->
+    <section id="view-ingesta" class="view-container">
+      <div class="container py-4 max-w-5xl">
+        <div class="glass-panel p-4 p-md-5 rounded-4 shadow-lg border border-white-15">
+          <div class="d-flex align-items-center gap-3 pb-3 border-bottom border-white-10 mb-4">
+            <div class="p-3 rounded-3 bg-primary bg-opacity-15 text-primary fs-3">
+              <i class="bi bi-cloud-arrow-up-fill"></i>
+            </div>
+            <div>
+              <h4 class="font-headline text-white mb-0">Carga Masiva de Registros de Consumo</h4>
+              <span class="text-white-50 small">Procese lotes de telemetría, facturas de energía y consumos de combustible con algoritmos deterministas.</span>
+            </div>
+          </div>
+
+          <!-- Module Selector -->
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <div class="p-3 rounded-3 glass-card border border-white-10 cursor-pointer">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="ingestModule" id="moduleCarbon" checked />
+                  <label class="form-check-label text-white fw-bold d-block" for="moduleCarbon">
+                    <i class="bi bi-fire text-primary me-1"></i> Huella de Carbono (Alcance 1 y 2)
+                  </label>
+                  <span class="text-white-50 small">Combustión fija, flota móvil, refrigerantes y compras de electricidad.</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="p-3 rounded-3 glass-card border border-white-10 cursor-pointer">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="ingestModule" id="moduleWater" />
+                  <label class="form-check-label text-white fw-bold d-block" for="moduleWater">
+                    <i class="bi bi-droplet-fill text-secondary me-1"></i> Balance Hídrico (ISO 14046)
+                  </label>
+                  <span class="text-white-50 small">Pozos profundos, redes municipales, vertimientos y recirculación.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dropzone -->
+          <div class="dropzone-efp mb-4" id="dropzone-ingesta">
+            <input type="file" id="file-input-ingesta" class="d-none" accept=".csv, .xlsx, .xls" />
+            <i class="bi bi-cloud-arrow-up display-4 text-primary d-block mb-3"></i>
+            <h5 class="text-white font-headline mb-1">Arrastre su archivo estructurado (.CSV o .XLSX) aquí</h5>
+            <p class="text-white-50 small mb-3">Soporta hasta 100.000 registros por lote. Validación automática con ClamAV.</p>
+            <button type="button" class="btn btn-sm btn-efp-primary px-3 py-1.5 font-headline small">
+              Seleccionar Archivo Local
+            </button>
+          </div>
+
+          <!-- Preloaded Templates -->
+          <div class="mb-4">
+            <span class="text-muted small d-block mb-2 font-mono-audit">O cargue una plantilla de prueba preconfigurada:</span>
+            <div class="d-flex flex-wrap gap-2">
+              <button type="button" class="btn btn-sm btn-efp-glass btn-preloaded-template" data-name="facturas_gas_q1_batch.xlsx" data-size="14.2">
+                <i class="bi bi-file-earmark-excel text-success me-1"></i> Facturas Gas Q1 (14,200 registros)
+              </button>
+              <button type="button" class="btn btn-sm btn-efp-glass btn-preloaded-template" data-name="telemetria_quilicura_stream.csv" data-size="8.6">
+                <i class="bi bi-file-earmark-spreadsheet text-info me-1"></i> Telemetría Caudalímetros Quilicura (8,400 registros)
+              </button>
+              <button type="button" class="btn btn-sm btn-efp-glass btn-preloaded-template" data-name="cert_emisiones_upme_2026.xlsx" data-size="3.1">
+                <i class="bi bi-file-earmark-text text-warning me-1"></i> Certificados de Emisión UPME Red (3,100 registros)
+              </button>
+            </div>
+          </div>
+
+          <!-- Selected File Box & ClamAV Alert -->
+          <div id="ingesta-file-display" class="mb-3"></div>
+          <div id="ingesta-scan-alert" class="mb-4"></div>
+
+          <!-- Ingest Action Button -->
+          <div class="d-flex align-items-center justify-content-between pt-3 border-top border-white-10">
+            <span class="text-white-50 small font-mono-audit">
+              <i class="bi bi-shield-check text-secondary me-1"></i> Motor Determinista con decimal.js
+            </span>
+            <button id="btn-ejecutar-ingesta" class="btn btn-efp-secondary px-4 py-2 font-headline small">
+              <i class="bi bi-play-circle-fill me-2"></i> Iniciar Ingesta Determinista
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. VIEW: SUBSANACIÓN DE ERRORES -->
+    <section id="view-subsanacion" class="view-container">
+      <div class="container-fluid px-3 px-sm-4 px-xl-5">
+        
+        <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3 p-4 rounded-4 glass-panel mb-4">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <span class="badge-pill-status badge-pill-warning">
+                <i class="bi bi-exclamation-triangle-fill"></i> Registros Observados
+              </span>
+              <span class="font-mono-audit text-white-50 small">Lote #BATCH-2026-09</span>
+            </div>
+            <h3 class="font-headline text-white fs-4 fw-bold mb-0">Bandeja de Subsanación de Inconsistencias</h3>
+            <p class="text-white-50 small mb-0">Corrija unidades incompatibles o asigne factores válidos antes del sellado final en el Ledger.</p>
+          </div>
+          <button id="btn-aplicar-subsanacion" class="btn btn-efp-primary px-3.5 py-2 font-headline small">
+            <i class="bi bi-check-all me-1"></i> Aplicar Correcciones y Recalcular
+          </button>
+        </div>
+
+        <div class="glass-panel p-4 rounded-4 shadow-lg">
+          <div class="table-responsive">
+            <table class="table table-efp">
+              <thead>
+                <tr>
+                  <th>Fila #</th>
+                  <th>Campo Afectado</th>
+                  <th>Valor Recibido</th>
+                  <th>Causa de Inconsistencia</th>
+                  <th>Acción Recomendada / Corrección</th>
+                  <th class="text-center">Estado</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-subsanacion">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+        <!-- 6. VIEW: REVISIÓN Y ENMIENDA EXCEPCIONAL (SCR-05) -->
+    <section id="view-enmienda" class="view-container">
+      <div class="container py-4" style="max-width: 1200px;">
+        
+        <!-- Breadcrumbs & Status Strip -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+          <div class="d-flex align-items-center gap-2 font-mono-audit small text-white-50">
+            <span>GOBERNANZA</span>
+            <span>/</span>
+            <span>CIERRES Y AUDITORÍA</span>
+            <span>/</span>
+            <span class="text-primary fw-bold">SCR-05: ENMIENDA EXCEPCIONAL</span>
+          </div>
+          <div class="d-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-dark bg-opacity-60 border border-white-5 text-white small">
+            <i class="bi bi-hammer text-warning"></i>
+            <span class="font-mono-audit text-uppercase small text-warning fw-semibold">
+              Protocolo ISO 14064-1 &amp; ISO 14046
+            </span>
+          </div>
+        </div>
+
+        <!-- Banner Estado Bloqueado: HTTP 423 Locked -->
+        <div class="glass-panel p-4 p-md-5 rounded-4 shadow-xl border border-warning border-opacity-30 mb-4 position-relative overflow-hidden">
+          <div class="position-absolute top-0 start-0 bottom-0" style="width: 4px; background: #ffb95f;"></div>
+          <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4">
+            <div class="d-flex align-items-start gap-3.5">
+              <div class="p-3 rounded-4 bg-warning bg-opacity-20 text-warning fs-3 border border-warning border-opacity-30 flex-shrink-0">
+                <i class="bi bi-lock-fill"></i>
+              </div>
+              <div>
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                  <span class="badge bg-warning bg-opacity-25 text-warning font-mono-audit border border-warning border-opacity-40">
+                    HTTP 423 LOCKED
+                  </span>
+                  <span class="font-headline text-white fs-6 fw-bold">
+                    ESTADO: PERÍODO CERRADO E INMUTABLE
+                  </span>
+                  <span class="font-mono-audit text-white-50 small">• 2026-ANUAL (v1)</span>
+                </div>
+                <p class="text-white-50 small mb-2" style="max-width: 780px;">
+                  El ledger contable está sellado criptográficamente. Cualquier ajuste retrospectivo sobre inventarios de <strong class="text-white">Alcance 1, Alcance 2 o Balance Hídrico</strong> exige la apertura controlada de una <strong class="text-warning">Enmienda Excepcional Versión 2</strong> conforme a las directrices de aseguramiento y auditoría corporativa.
+                </p>
+                <div class="d-flex align-items-center gap-2 font-mono-audit small text-white-50 flex-wrap">
+                  <i class="bi bi-check-circle-fill text-secondary"></i>
+                  <span>SHA-256 LEDGER:</span>
+                  <span class="text-primary fw-semibold text-break" id="enmienda-hash-display">
+                    89c44e9102ab837f44a10e82cda991f83c18bb39f01e2ac9748b0213cd41fa90
+                  </span>
+                  <button id="btn-copy-hash" class="btn btn-sm btn-outline-light border-0 p-1 text-white-50 hover-text-white" title="Copiar hash de ledger">
+                    <i class="bi bi-clipboard"></i>
+                  </button>
+                  <span id="copied-hash-badge" class="text-secondary small d-none">¡Copiado!</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex flex-column align-items-lg-end text-lg-end font-mono-audit small text-white-50 flex-shrink-0">
+              <span>SELLO EJECUTADO:</span>
+              <span class="text-white fw-bold">15-ENE-2026 18:42:09 UTC</span>
+              <span class="badge bg-dark bg-opacity-80 text-white-50 border border-white-10 mt-1">
+                MODO SOLO LECTURA
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resumen Ejecutivo del Período V1 (Congelado) -->
+        <div class="row g-3 mb-4">
+          <!-- KPI 1 -->
+          <div class="col-sm-6 col-lg-3">
+            <div class="glass-card p-4 rounded-4 h-100 d-flex flex-column justify-content-between shadow-md">
+              <div class="d-flex align-items-center justify-content-between small text-white-50">
+                <span class="font-mono-audit text-uppercase" style="font-size: 10px;">Huella de Carbono V1</span>
+                <span class="p-1 rounded bg-dark text-primary"><i class="bi bi-lock-fill"></i></span>
+              </div>
+              <div class="mt-2 d-flex align-items-baseline gap-2">
+                <span class="font-metric text-white fs-3 fw-bold">14,285.74</span>
+                <span class="font-mono-audit text-white-50 small">tCO₂e</span>
+              </div>
+              <div class="font-mono-audit text-white-50 mt-1" style="font-size: 11px;">
+                Alcance 1: 8,410.20 | Alcance 2: 5,875.54
+              </div>
+              <div class="progress mt-3 rounded-pill bg-dark" style="height: 6px;">
+                <div class="progress-bar bg-primary" style="width: 100%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI 2 -->
+          <div class="col-sm-6 col-lg-3">
+            <div class="glass-card p-4 rounded-4 h-100 d-flex flex-column justify-content-between shadow-md">
+              <div class="d-flex align-items-center justify-content-between small text-white-50">
+                <span class="font-mono-audit text-uppercase" style="font-size: 10px;">Balance Hídrico V1</span>
+                <span class="p-1 rounded bg-dark text-secondary"><i class="bi bi-lock-fill"></i></span>
+              </div>
+              <div class="mt-2 d-flex align-items-baseline gap-2">
+                <span class="font-metric text-white fs-3 fw-bold">128,450.0</span>
+                <span class="font-mono-audit text-white-50 small">m³</span>
+              </div>
+              <div class="font-mono-audit text-white-50 mt-1" style="font-size: 11px;">
+                Consumo: 92,100 m³ | Descargas: 36,350 m³
+              </div>
+              <div class="progress mt-3 rounded-pill bg-dark" style="height: 6px;">
+                <div class="progress-bar bg-secondary" style="width: 100%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI 3 -->
+          <div class="col-sm-6 col-lg-3">
+            <div class="glass-card p-4 rounded-4 h-100 d-flex flex-column justify-content-between shadow-md">
+              <div class="d-flex align-items-center justify-content-between small text-white-50">
+                <span class="font-mono-audit text-uppercase" style="font-size: 10px;">Evidencias Custodiadas</span>
+                <span class="p-1 rounded bg-dark text-secondary"><i class="bi bi-check-circle-fill"></i></span>
+              </div>
+              <div class="mt-2 d-flex align-items-baseline gap-2">
+                <span class="font-metric text-white fs-3 fw-bold">412</span>
+                <span class="font-mono-audit text-secondary small fw-bold">100% AUDITADAS</span>
+              </div>
+              <div class="font-mono-audit text-white-50 mt-1" style="font-size: 11px;">
+                Archivos PDF/XLSX con HMAC activo
+              </div>
+              <div class="progress mt-3 rounded-pill bg-dark" style="height: 6px;">
+                <div class="progress-bar bg-secondary" style="width: 100%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI 4 -->
+          <div class="col-sm-6 col-lg-3">
+            <div class="glass-card p-4 rounded-4 h-100 d-flex flex-column justify-content-between shadow-md">
+              <div class="d-flex align-items-center justify-content-between small text-white-50">
+                <span class="font-mono-audit text-uppercase" style="font-size: 10px;">Aseguramiento Externo</span>
+                <span class="p-1 rounded bg-dark text-warning"><i class="bi bi-patch-check-fill"></i></span>
+              </div>
+              <div class="my-2">
+                <span class="font-headline text-white small fw-bold d-block">Dictamen Conforme</span>
+                <span class="text-white-50" style="font-size: 11px;">Bureau Veritas S.A. | R-HSEQ-2026-09</span>
+              </div>
+              <button class="btn btn-sm btn-efp-glass w-100 font-headline small text-primary" data-view="dashboard">
+                Inspeccionar Ledger V1
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Protocolo de Enmienda Excepcional (Apertura V2) -->
+        <div class="glass-panel p-4 p-md-5 rounded-4 shadow-2xl border border-white-15">
+          <!-- Header -->
+          <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 pb-3 border-bottom border-white-10 mb-4">
+            <div class="d-flex align-items-start gap-3">
+              <div class="p-2.5 rounded-3 bg-warning bg-opacity-20 text-warning fs-4">
+                <i class="bi bi-file-earmark-diff-fill"></i>
+              </div>
+              <div>
+                <div class="d-flex align-items-center gap-2">
+                  <h4 class="font-headline text-white fs-5 fw-bold mb-0">
+                    Protocolo de Enmienda Excepcional (Apertura V2)
+                  </h4>
+                  <span class="badge bg-primary bg-opacity-20 text-primary border border-primary border-opacity-30 font-mono-audit">
+                    SCR-05
+                  </span>
+                </div>
+                <p class="text-white-50 small mb-0 mt-1">
+                  La formalización de una Enmienda V2 no sobreescribe registros históricos: bifurca el ciclo contable para admitir recálculos justificados manteniendo trazabilidad forense intacta.
+                </p>
+              </div>
+            </div>
+            <div class="d-flex align-items-center gap-2 flex-shrink-0">
+              <span class="pulse-dot bg-warning"></span>
+              <span id="enmienda-status-badge" class="font-mono-audit small text-warning fw-bold text-uppercase">
+                Enmienda en Espera
+              </span>
+            </div>
+          </div>
+
+          <!-- Methodology Notice Banner -->
+          <div class="p-3.5 rounded-3 bg-dark bg-opacity-60 border border-white-10 small mb-4 d-flex align-items-start gap-3">
+            <i class="bi bi-info-circle-fill text-primary fs-5 mt-0.5"></i>
+            <div>
+              <strong class="text-white d-block mb-1">
+                Aviso de Auditoría y Trazabilidad Permanente (GHG Protocol Corporate Standard)
+              </strong>
+              <p class="text-white-50 mb-0">
+                La versión <strong class="text-white font-monospace">2026-ANUAL (v1)</strong> quedará preservada como <span class="text-warning fw-semibold">«Sustituida / Histórica»</span> y estará permanentemente indexada en la memoria institucional. La versión <strong class="text-secondary font-monospace">v2</strong> asumirá el estatus de <span class="text-secondary fw-semibold">«Borrador de Enmienda»</span> hasta que el Oficial HSEQ y el Comité de Sostenibilidad ejecuten la firma mancomunada.
+              </p>
+            </div>
+          </div>
+
+          <!-- Form -->
+          <form id="form-enmienda-v2">
+            <div class="row g-4 mb-4">
+              <!-- Left Col -->
+              <div class="col-lg-7">
+                <div class="mb-3">
+                  <label class="form-label text-white-50 small fw-semibold d-flex justify-content-between">
+                    <span>1. Categoría de Corrección Metodológica <span class="text-danger">*</span></span>
+                    <span class="font-mono-audit text-muted" style="font-size: 10px;">REQUERIDO</span>
+                  </label>
+                  <select id="enmienda-category" class="form-select form-select-efp" required>
+                    <option value="" selected>Seleccione causal técnica justificada...</option>
+                    <option value="factor_actualizado">Actualización de Factor de Emisión Oficial (UPME / IPCC)</option>
+                    <option value="error_telemetria">Rectificación de Medidor Telemétrico de Caudal Hídrico</option>
+                    <option value="factura_extemporanea">Incorporación de Factura Extemporánea Auditada</option>
+                    <option value="reclasificacion_alcance">Reclasificación entre Alcance 1 y Alcance 2</option>
+                    <option value="metodologia_ghg">Actualización Metodológica GHG Protocol Corporate Standard</option>
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label text-white-50 small fw-semibold d-flex justify-content-between">
+                    <span>2. Justificación Técnica y Causa Raíz <span class="text-danger">*</span></span>
+                    <span class="font-mono-audit text-muted" style="font-size: 10px;">MÍNIMO 40 CARACTERES</span>
+                  </label>
+                  <textarea id="enmienda-reason" rows="4" class="form-control form-control-efp" placeholder="Detalle la causal técnica, los cálculos recalculados, el número de acta del comité de sostenibilidad y el impacto esperado en tCO2e o m³..." required></textarea>
+                </div>
+
+                <div>
+                  <label class="form-label text-white-50 small fw-semibold mb-2">
+                    3. Alcances Contables Afectados por el Recálculo
+                  </label>
+                  <div class="d-flex flex-wrap gap-4 p-3 rounded-3 bg-dark bg-opacity-40 border border-white-5">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="chkGhg" checked />
+                      <label class="form-check-label text-white small" for="chkGhg">
+                        Huella Carbono (Alcance 1 y 2)
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="chkWater" checked />
+                      <label class="form-check-label text-white small" for="chkWater">
+                        Balance Hídrico (ISO 14046)
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="chkScope3" />
+                      <label class="form-check-label text-white small" for="chkScope3">
+                        Alcance 3 (Cadena de Valor)
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Col -->
+              <div class="col-lg-5 d-flex flex-column justify-content-between">
+                <div>
+                  <label class="form-label text-white-50 small fw-semibold mb-2">
+                    4. Adjuntar Acta Aprobatoria de Comité HSEQ / Minuta (PDF)
+                  </label>
+                  <div class="dropzone-efp p-4 text-center mb-3" id="dropzone-enmienda">
+                    <i class="bi bi-cloud-arrow-up text-secondary fs-2 mb-2 d-block"></i>
+                    <span class="text-white small fw-bold d-block" id="enmienda-file-label">
+                      Arrastre el Acta Firmada en PDF aquí
+                    </span>
+                    <span class="text-white-50 d-block mt-1" style="font-size: 11px;">
+                      o haga clic para seleccionar archivo (máx. 25 MB)
+                    </span>
+                    <input type="file" id="enmienda-file-input" class="d-none" accept=".pdf" />
+                  </div>
+
+                  <div class="p-3 rounded-3 bg-dark bg-opacity-40 border border-white-5 text-white-50 small font-mono-audit">
+                    <div class="d-flex align-items-center gap-1.5 text-secondary fw-bold mb-1">
+                      <i class="bi bi-shield-check"></i> Custodia Probatoria:
+                    </div>
+                    <div>El archivo PDF adjunto se someterá a análisis antivirus ClamAV y se le asignará una firma HMAC-SHA256 vinculada al nuevo bloque V2.</div>
+                  </div>
+                </div>
+
+                <div class="mt-3">
+                  <div class="form-check p-3 rounded-3 bg-dark bg-opacity-40 border border-white-10">
+                    <input class="form-check-input ms-0 me-2" type="checkbox" id="enmienda-terms" required />
+                    <label class="form-check-label text-white-50 small" for="enmienda-terms">
+                      Certifico como Oficial HSEQ Titular que esta enmienda cumple con los lineamientos de la norma ISO 14064-3 y no invalida el histórico original de la versión v1.
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 pt-3 border-top border-white-10">
+              <span class="text-warning small font-mono-audit d-flex align-items-center gap-2">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <span>Se generará una nueva rama contable y un hash de bloque V2</span>
+              </span>
+              <button type="submit" id="btn-submit-enmienda" class="btn btn-efp-secondary px-4 py-2 font-headline small">
+                <i class="bi bi-shield-lock-fill me-2"></i> Iniciar Protocolo de Enmienda V2
+              </button>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. VIEW: NOTIFICACIONES & AUDITORÍA FORENSE -->
+    <section id="view-notificaciones" class="view-container">
+      <div class="container py-4 max-w-5xl">
+        
+        <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3 p-4 rounded-4 glass-panel mb-4">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <span class="font-mono-audit text-primary text-uppercase fw-bold small">Monitoreo de Anomalías</span>
+              <span class="text-muted">•</span>
+              <span class="font-mono-audit text-white-50 small">Ledger SHA-256</span>
+            </div>
+            <h3 class="font-headline text-white fs-4 fw-bold mb-0">Expediente de Auditoría Forense</h3>
+          </div>
+          <button id="btn-export-logs" class="btn btn-sm btn-efp-primary px-3 py-1.5 font-headline small">
+            <i class="bi bi-download me-1"></i> Exportar Log Forense (.JSON)
+          </button>
+        </div>
+
+        <!-- Filter Pills & Search -->
+        <div class="glass-panel p-3 rounded-4 mb-4 d-flex flex-wrap align-items-center justify-content-between gap-3">
+          <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-sm btn-efp-glass active px-3" data-filter="todas">Todas</button>
+            <button class="btn btn-sm btn-efp-glass text-danger px-3" data-filter="critical">Críticas</button>
+            <button class="btn btn-sm btn-efp-glass text-warning px-3" data-filter="warning">Advertencias</button>
+            <button class="btn btn-sm btn-efp-glass text-info px-3" data-filter="info">Informativas</button>
+          </div>
+          <div class="input-group" style="max-width: 280px;">
+            <span class="input-group-text bg-dark bg-opacity-70 border-white-10 text-white-50"><i class="bi bi-search"></i></span>
+            <input type="text" id="search-notificaciones" class="form-control form-control-sm form-control-efp" placeholder="Buscar por traza o error..." />
+          </div>
+        </div>
+
+        <!-- Timeline of Events -->
+        <div id="container-notificaciones-list">
+          <!-- Injected via JS -->
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 8. VIEW: GESTIÓN DE USUARIOS (RBAC) -->
+    <section id="view-usuarios" class="view-container">
+      <div class="container-fluid px-3 px-sm-4 px-xl-5">
+        
+        <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3 p-4 rounded-4 glass-panel mb-4">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <span class="badge-pill-status badge-pill-primary">Control de Acceso Basado en Roles</span>
+              <span class="font-mono-audit text-white-50 small">Supabase Auth & RBAC</span>
+            </div>
+            <h3 class="font-headline text-white fs-4 fw-bold mb-0">Gestión de Usuarios y Permisos</h3>
+          </div>
+          <button class="btn btn-sm btn-efp-secondary px-3 py-1.5 font-headline small" data-bs-toggle="modal" data-bs-target="#modalAdmin">
+            <i class="bi bi-person-plus me-1"></i> Gestionar Perfil Admin
+          </button>
+        </div>
+
+        <div class="glass-panel p-4 rounded-4 shadow-lg">
+          <div class="table-responsive">
+            <table class="table table-efp">
+              <thead>
+                <tr>
+                  <th>Usuario</th>
+                  <th>Rol Asignado</th>
+                  <th>Sede Autorizada</th>
+                  <th class="text-center">MFA</th>
+                  <th class="text-center">Estado</th>
+                  <th class="text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-usuarios">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 9. VIEW: GESTIÓN DE SEDES -->
+    <section id="view-sedes" class="view-container">
+      <div class="container-fluid px-3 px-sm-4 px-xl-5">
+        
+        <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3 p-4 rounded-4 glass-panel mb-4">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <span class="font-mono-audit text-secondary text-uppercase fw-bold small">Catálogo Maestro</span>
+              <span class="text-muted">•</span>
+              <span class="font-mono-audit text-white-50 small">50 Instalaciones Activas</span>
+            </div>
+            <h3 class="font-headline text-white fs-4 fw-bold mb-0">Monitoreo de Sedes Industriales y Complejos</h3>
+          </div>
+        </div>
+
+        <div class="glass-panel p-4 rounded-4 shadow-lg">
+          <div class="table-responsive">
+            <table class="table table-efp">
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Nombre Complejo</th>
+                  <th>Tipo Instalación</th>
+                  <th>Ubicación</th>
+                  <th class="text-end">Huella Carbono</th>
+                  <th class="text-end">Balance Hídrico</th>
+                  <th class="text-center">Estrés Hídrico</th>
+                  <th class="text-center">Expediente</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-sedes-crud">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 10. VIEW: FACTORES DE EMISIÓN -->
+    <section id="view-factores" class="view-container">
+      <div class="container-fluid px-3 px-sm-4 px-xl-5">
+        
+        <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3 p-4 rounded-4 glass-panel mb-4">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <span class="font-mono-audit text-primary text-uppercase fw-bold small">Base de Factores Homologados</span>
+              <span class="text-muted">•</span>
+              <span class="font-mono-audit text-white-50 small">IPCC, UPME, DEFRA, GHG Protocol</span>
+            </div>
+            <h3 class="font-headline text-white fs-4 fw-bold mb-0">Catálogo de Factores de Emisión Oficiales</h3>
+          </div>
+        </div>
+
+        <div class="glass-panel p-4 rounded-4 shadow-lg">
+          <div class="table-responsive">
+            <table class="table table-efp">
+              <thead>
+                <tr>
+                  <th>Código Actividad</th>
+                  <th>Fuente de Emisión</th>
+                  <th>Categoría GHG</th>
+                  <th class="text-end">Valor Factor</th>
+                  <th>Unidad Base</th>
+                  <th>Protocolo Fuente</th>
+                  <th class="text-center">Año</th>
+                  <th class="text-center">Estado</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-factores">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 11. VIEW: PERÍODOS CONTABLES -->
+    <section id="view-periodos" class="view-container">
+      <div class="container-fluid px-3 px-sm-4 px-xl-5">
+        
+        <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3 p-4 rounded-4 glass-panel mb-4">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <span class="badge-pill-status badge-pill-verified">Cierre Contable Determinista</span>
+              <span class="font-mono-audit text-white-50 small">Inmutabilidad Criptográfica</span>
+            </div>
+            <h3 class="font-headline text-white fs-4 fw-bold mb-0">Períodos de Reporte y Sellado Criptográfico</h3>
+          </div>
+          <button class="btn btn-sm btn-efp-primary px-3 py-1.5 font-headline small" data-view="enmienda">
+            <i class="bi bi-file-earmark-plus me-1"></i> Abrir Enmienda Metodológica
+          </button>
+        </div>
+
+        <div class="glass-panel p-4 rounded-4 shadow-lg">
+          <div class="table-responsive">
+            <table class="table table-efp">
+              <thead>
+                <tr>
+                  <th>Código Período</th>
+                  <th>Versión</th>
+                  <th>Estado</th>
+                  <th>Hash Ledger (SHA-256)</th>
+                  <th>Fecha de Cierre</th>
+                  <th>Oficial Responsable</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-periodos">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 12. VIEW: PANEL DE ADMINISTRACIÓN GLOBAL -->
+    <section id="view-administracion" class="view-container">
+      <div class="container py-4 max-w-5xl">
+        
+        <div class="glass-panel p-4 p-md-5 rounded-4 shadow-lg border border-white-15 mb-4">
+          <div class="d-flex align-items-center gap-3 pb-3 border-bottom border-white-10 mb-4">
+            <div class="p-3 rounded-3 bg-secondary bg-opacity-15 text-secondary fs-3">
+              <i class="bi bi-sliders"></i>
+            </div>
+            <div>
+              <h4 class="font-headline text-white mb-0">Panel de Control y Diagnóstico Global</h4>
+              <span class="text-white-50 small">Gestión de la infraestructura, estado del servidor Supabase y auditoría del motor determinista.</span>
+            </div>
+          </div>
+
+          <div class="row g-4 text-center mb-4">
+            <div class="col-6 col-md-3">
+              <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-white-5">
+                <span class="text-muted d-block small mb-1">Latencia Backend</span>
+                <span id="admin-latency-val" class="font-metric text-secondary fs-3">28 ms</span>
+                <span class="text-secondary font-monospace small d-block">SSL Activo</span>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-white-5">
+                <span class="text-muted d-block small mb-1">Usuarios Registrados</span>
+                <span id="admin-count-users" class="font-metric text-white fs-3">4</span>
+                <span class="text-white-50 font-monospace small d-block">RBAC Activo</span>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-white-5">
+                <span class="text-muted d-block small mb-1">Sedes Operativas</span>
+                <span id="admin-count-sedes" class="font-metric text-white fs-3">5</span>
+                <span class="text-white-50 font-monospace small d-block">Multi-País</span>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-white-5">
+                <span class="text-muted d-block small mb-1">Factores Homologados</span>
+                <span id="admin-count-factores" class="font-metric text-primary fs-3">6</span>
+                <span class="text-primary font-monospace small d-block">IPCC / UPME</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Administration Tools Grid -->
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="p-3 rounded-3 glass-card border border-white-10 h-100 d-flex flex-column justify-content-between">
+                <div>
+                  <h6 class="font-headline text-white mb-1"><i class="bi bi-database-check text-primary me-2"></i>Conexión Supabase Cloud</h6>
+                  <p class="text-white-50 small">Ajuste la URL del proyecto, llave de API y ejecute el test de conectividad en tiempo real.</p>
+                </div>
+                <button class="btn btn-sm btn-efp-primary align-self-start mt-2" data-bs-toggle="modal" data-bs-target="#modalSupabase">
+                  Abrir Configuración Supabase
+                </button>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="p-3 rounded-3 glass-card border border-white-10 h-100 d-flex flex-column justify-content-between">
+                <div>
+                  <h6 class="font-headline text-white mb-1"><i class="bi bi-shield-check text-secondary me-2"></i>Verificación Criptográfica</h6>
+                  <p class="text-white-50 small">Valide la consistencia de las firmas SHA-256 de todas las tablas contra el bloque de sellado.</p>
+                </div>
+                <button class="btn btn-sm btn-efp-secondary align-self-start mt-2" onclick="alert('¡Verificación Exitosa! 100% de los hashes Merkle Root concuerdan con el Ledger.')">
+                  Verificar Integridad de Bloques
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+    <!-- Right Fixed Drawer Sidebar matching React Sidebar.tsx -->
+    <aside id="efp-sidebar" class="efp-sidebar show-sidebar">
+      <div class="d-flex flex-column px-3 pt-3 overflow-y-auto" style="gap: 1rem;">
+        <!-- Navigation header -->
+        <div class="d-flex align-items-center justify-content-between pb-2 border-bottom border-white-5">
+          <span class="font-mono-audit text-uppercase tracking-wider text-muted" style="font-size: 11px;">
+            Navegación del Sistema
+          </span>
+          <span class="pulse-dot bg-secondary" title="En línea y seguro"></span>
+        </div>
+
+        <!-- Primary nav items -->
+        <nav class="d-flex flex-column gap-1" id="sidebar-nav-list">
+          <!-- Admin items -->
+          <div id="sidebar-admin-section" class="d-flex flex-column gap-1">
+            <button class="sidebar-admin-item sidebar-nav-item d-flex align-items-center justify-content-between text-start" data-view="usuarios">
+              <div class="d-flex align-items-center gap-2.5">
+                <i class="bi bi-people text-secondary"></i>
+                <span>Gestión de Usuarios</span>
+              </div>
+              <span class="font-mono-audit text-[9px] bg-secondary bg-opacity-20 text-secondary px-1.5 py-0.5 rounded fw-bold" style="font-size: 9px;">RBAC</span>
+            </button>
+
+            <button class="sidebar-admin-item sidebar-nav-item d-flex align-items-center justify-content-between text-start" data-view="sedes">
+              <div class="d-flex align-items-center gap-2.5">
+                <i class="bi bi-buildings text-secondary"></i>
+                <span>Gestión de Sedes</span>
+              </div>
+              <span class="font-mono-audit text-[9px] bg-secondary bg-opacity-20 text-secondary px-1.5 py-0.5 rounded fw-bold" style="font-size: 9px;">MULTI</span>
+            </button>
+
+            <button class="sidebar-admin-item sidebar-nav-item d-flex align-items-center justify-content-between text-start" data-view="factores">
+              <div class="d-flex align-items-center gap-2.5">
+                <i class="bi bi-fire text-secondary"></i>
+                <span>Factores de Emisión</span>
+              </div>
+              <span class="font-mono-audit text-[9px] bg-secondary bg-opacity-20 text-secondary px-1.5 py-0.5 rounded fw-bold" style="font-size: 9px;">GHG</span>
+            </button>
+
+            <button class="sidebar-admin-item sidebar-nav-item d-flex align-items-center justify-content-between text-start" data-view="periodos">
+              <div class="d-flex align-items-center gap-2.5">
+                <i class="bi bi-calendar3 text-secondary"></i>
+                <span>Períodos Contables</span>
+              </div>
+              <span class="font-mono-audit text-[9px] bg-secondary bg-opacity-20 text-secondary px-1.5 py-0.5 rounded fw-bold" style="font-size: 9px;">LEDGER</span>
+            </button>
+
+            <button class="sidebar-admin-item sidebar-nav-item d-flex align-items-center justify-content-between text-start" data-view="administracion">
+              <div class="d-flex align-items-center gap-2.5">
+                <i class="bi bi-shield-check text-secondary"></i>
+                <span>Panel Admin (Total)</span>
+              </div>
+              <span class="font-mono-audit text-[9px] bg-secondary bg-opacity-20 text-secondary px-1.5 py-0.5 rounded fw-bold" style="font-size: 9px;">ADMIN</span>
+            </button>
+          </div>
+
+          <!-- Operational nav items -->
+          <button class="sidebar-nav-item active d-flex align-items-center gap-2.5 text-start" data-view="dashboard">
+            <i class="bi bi-speedometer2 text-primary"></i>
+            <span>Panel de Control</span>
+          </button>
+
+          <button class="sidebar-nav-item d-flex align-items-center gap-2.5 text-start" data-view="ingesta">
+            <i class="bi bi-cloud-arrow-up"></i>
+            <span>Carga Masiva</span>
+          </button>
+
+          <button class="sidebar-nav-item d-flex align-items-center justify-content-between text-start" data-view="subsanacion">
+            <div class="d-flex align-items-center gap-2.5">
+              <i class="bi bi-wrench-adjustable"></i>
+              <span>Subsanación</span>
+            </div>
+            <span class="badge bg-warning bg-opacity-25 text-warning border border-warning border-opacity-40 font-mono-audit px-1.5 py-0.5" style="font-size: 10px;">5</span>
+          </button>
+
+          <button class="sidebar-nav-item d-flex align-items-center gap-2.5 text-start" data-view="enmienda">
+            <i class="bi bi-clipboard-check"></i>
+            <span>Revisión HSEQ</span>
+          </button>
+
+          <button class="sidebar-nav-item d-flex align-items-center gap-2.5 text-start" data-view="enmienda">
+            <i class="bi bi-patch-check-fill text-secondary"></i>
+            <span>Cierre Oficial (SCR-05)</span>
+          </button>
+
+          <button class="sidebar-nav-item d-flex align-items-center gap-2.5 text-start" data-view="dashboard">
+            <i class="bi bi-archive"></i>
+            <span>Factores &amp; Evidencias</span>
+          </button>
+
+          <button class="sidebar-nav-item d-flex align-items-center gap-2.5 text-start" data-view="notificaciones">
+            <i class="bi bi-shield-exclamation text-danger"></i>
+            <span>Notificaciones &amp; RFC 7807</span>
+          </button>
+        </nav>
+
+        <!-- Quick Tools -->
+        <div class="pt-2 border-top border-white-5">
+          <span class="font-mono-audit text-uppercase tracking-wider text-muted px-1 d-block mb-1.5" style="font-size: 10px;">
+            Herramientas Rápidas
+          </span>
+          <div class="d-flex flex-column gap-1">
+            <button class="sidebar-tool-item d-flex align-items-center justify-content-between text-start text-secondary" data-bs-toggle="modal" data-bs-target="#modalAdmin">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-shield-check text-secondary"></i>
+                <span>Admin (UID 123123)</span>
+              </div>
+              <span class="font-mono-audit text-[9px] bg-secondary bg-opacity-20 px-1 rounded">SuperAdmin</span>
+            </button>
+            <button class="sidebar-tool-item d-flex align-items-center gap-2 text-start text-white-50" data-bs-toggle="modal" data-bs-target="#modalSupabase">
+              <i class="bi bi-database text-secondary"></i>
+              <span>Base de Datos Supabase</span>
+            </button>
+            <button class="sidebar-tool-item d-flex align-items-center gap-2 text-start text-white-50" data-view="notificaciones">
+              <i class="bi bi-clock-history"></i>
+              <span>Auditoría de Cambios</span>
+            </button>
+            <button class="sidebar-tool-item d-flex align-items-center gap-2 text-start text-white-50" data-view="enmienda">
+              <i class="bi bi-gear"></i>
+              <span>Configuración HSEQ</span>
+            </button>
+            <button class="sidebar-tool-item d-flex align-items-center gap-2 text-start text-white-50" data-view="landing">
+              <i class="bi bi-question-circle"></i>
+              <span>Guía y Protocolos</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer status card & logout -->
+      <div class="px-3 pt-2 border-top border-white-5 mt-auto">
+        <div class="p-2 rounded-3 bg-dark bg-opacity-70 border border-white-5 d-flex align-items-center justify-content-between mb-2 shadow-sm">
+          <div class="d-flex flex-column">
+            <span class="text-white fw-bold" style="font-size: 11px;">Estado Ledger</span>
+            <span class="font-mono-audit text-secondary" style="font-size: 10px;">Sincronizado</span>
+          </div>
+          <i class="bi bi-lock-fill text-secondary"></i>
+        </div>
+
+        <button id="btn-sidebar-logout" class="btn btn-sm btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2 py-1.5 text-danger border-0 font-label-sm" style="font-size: 11px;">
+          <i class="bi bi-box-arrow-right"></i>
+          <span>Cerrar Sesión</span>
+        </button>
+      </div>
+    </aside>
+  </div> <!-- /.main-layout-container -->
+
+  <!-- =========================================================================
+       MODALS
+       ========================================================================= -->
+
+  <!-- 1. MODAL: SUPABASE CONFIGURATION & DDL -->
+  <div class="modal fade" id="modalSupabase" tabindex="-1" aria-labelledby="modalSupabaseLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content glass-modal">
+        <div class="modal-header border-bottom border-white-10">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-database-gear text-primary fs-4"></i>
+            <div>
+              <h5 class="modal-title font-headline text-white mb-0" id="modalSupabaseLabel">Configuración de Backend Supabase PostgreSQL</h5>
+              <span class="font-mono-audit text-muted small">Proyecto Oficial: pmtzrwdbgzufxemlwqaf</span>
+            </div>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          
+          <ul class="nav nav-pills mb-3 gap-2" id="supabase-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link btn-efp-glass active font-headline small" id="tab-connect-btn" data-bs-toggle="pill" data-bs-target="#tab-connect" type="button" role="tab">
+                <i class="bi bi-hdd-network me-1"></i> Conexión
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link btn-efp-glass font-headline small" id="tab-schema-btn" data-bs-toggle="pill" data-bs-target="#tab-schema" type="button" role="tab">
+                <i class="bi bi-code-slash me-1"></i> Script SQL DDL
+              </button>
+            </li>
+          </ul>
+
+          <div class="tab-content">
+            <!-- Connect Tab -->
+            <div class="tab-pane fade show active" id="tab-connect" role="tabpanel">
+              <div id="supabase-test-result"></div>
+
+              <div class="mb-3">
+                <label class="form-label text-white-50 small fw-semibold">Supabase Project URL</label>
+                <input type="text" id="input-supabase-url" class="form-control form-control-efp font-monospace" value="https://pmtzrwdbgzufxemlwqaf.supabase.co" />
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label text-white-50 small fw-semibold">Supabase Anon Key (API Publishable)</label>
+                <input type="password" id="input-supabase-key" class="form-control form-control-efp font-monospace" value="sb_publishable_v9WMpFH0shnWEmzkTR8dCA_2a1UoP9K" />
+              </div>
+
+              <div class="d-flex align-items-center justify-content-between pt-3 border-top border-white-10">
+                <button type="button" id="btn-test-supabase" class="btn btn-outline-info font-headline small">
+                  <i class="bi bi-hdd-network me-1"></i> Probar Conexión
+                </button>
+                <button type="button" id="btn-save-supabase" class="btn btn-efp-primary font-headline small">
+                  <i class="bi bi-check2 me-1"></i> Guardar y Conectar
+                </button>
+              </div>
+            </div>
+
+            <!-- Schema Tab -->
+            <div class="tab-pane fade" id="tab-schema" role="tabpanel">
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-white-50 small font-mono-audit">Esquema Determinista PostgreSQL:</span>
+                <button type="button" id="btn-copy-sql" class="btn btn-sm btn-outline-info font-headline small">
+                  <i class="bi bi-clipboard me-1"></i> Copiar SQL Completo
+                </button>
+              </div>
+              <div class="code-box">
+-- =====================================================================
+-- EFP PLATFORM - DDL ESQUEMA COMPLETO PARA SUPABASE POSTGRESQL
+-- =====================================================================
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE TABLE IF NOT EXISTS sedes (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    codigo_sede VARCHAR(50) NOT NULL UNIQUE,
+    nombre VARCHAR(150) NOT NULL,
+    tipo_instalacion VARCHAR(100) NOT NULL,
+    ciudad VARCHAR(100) NOT NULL,
+    pais VARCHAR(100) NOT NULL,
+    huella_carbono_tco2e NUMERIC(18, 6) DEFAULT 0.000000,
+    balance_hidrico_m3 NUMERIC(18, 6) DEFAULT 0.000000,
+    estado_auditoria VARCHAR(50) DEFAULT 'VALIDADO_100',
+    nivel_estres_hidrico VARCHAR(50) DEFAULT 'BAJO'
+);
+
+CREATE TABLE IF NOT EXISTS periodos_reporte (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    codigo_periodo VARCHAR(50) NOT NULL,
+    version INTEGER NOT NULL DEFAULT 1,
+    estado VARCHAR(50) NOT NULL DEFAULT 'CERRADO',
+    hash_ledger_sha256 VARCHAR(64)
+);
+
+CREATE TABLE IF NOT EXISTS kpis_resumen (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    codigo_periodo VARCHAR(50) NOT NULL DEFAULT '2026-ANUAL',
+    huella_carbono_total NUMERIC(18, 6) NOT NULL DEFAULT 14285.74,
+    alcance_1_directo NUMERIC(18, 6) NOT NULL DEFAULT 8920.12,
+    alcance_2_indirecto NUMERIC(18, 6) NOT NULL DEFAULT 5365.62,
+    consumo_agua_total_m3 NUMERIC(18, 6) NOT NULL DEFAULT 128450.00,
+    desbalance_agua_m3 NUMERIC(18, 6) NOT NULL DEFAULT 0.000
+);
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. MODAL: ADMIN IDENTIFIER & PERSONAS -->
+  <div class="modal fade" id="modalAdmin" tabindex="-1" aria-labelledby="modalAdminLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content glass-modal">
+        <div class="modal-header border-bottom border-white-10">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-shield-check text-secondary fs-4"></i>
+            <div>
+              <h5 class="modal-title font-headline text-white mb-0" id="modalAdminLabel">Administrador del Sistema</h5>
+              <span class="font-mono-audit text-secondary small">UID Corporativo: 123123</span>
+            </div>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="d-flex align-items-center gap-3 p-3 rounded-3 bg-dark bg-opacity-60 border border-white-10 mb-3">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80" alt="Admin" class="rounded-circle border border-white-20" width="48" height="48" style="object-fit: cover;">
+            <div>
+              <strong class="text-white d-block">Administrador Principal General</strong>
+              <span class="text-muted small font-monospace">admin@corporacion.com</span>
+              <span class="badge bg-secondary bg-opacity-20 text-secondary border border-secondary border-opacity-30 rounded-pill px-2 py-0.5 small d-inline-block mt-1 font-mono-audit">ADMIN_TI</span>
+            </div>
+          </div>
+
+          <h6 class="font-headline text-white fs-6 mb-2">Permisos del Sistema Asignados:</h6>
+          <div class="row g-2 font-mono-audit small text-white-50 mb-3">
+            <div class="col-6"><i class="bi bi-check-circle-fill text-secondary me-1"></i> Super Admin Total</div>
+            <div class="col-6"><i class="bi bi-check-circle-fill text-secondary me-1"></i> Ingesta Masiva 100k</div>
+            <div class="col-6"><i class="bi bi-check-circle-fill text-secondary me-1"></i> Enmienda V2 ISO</div>
+            <div class="col-6"><i class="bi bi-check-circle-fill text-secondary me-1"></i> Auditoría Forense</div>
+            <div class="col-6"><i class="bi bi-check-circle-fill text-secondary me-1"></i> Subsanación Errores</div>
+            <div class="col-6"><i class="bi bi-check-circle-fill text-secondary me-1"></i> Supabase DDL Exec</div>
+          </div>
+
+          <h6 class="font-headline text-white fs-6 mb-2 mt-3">Cambiar de Perfil Demo:</h6>
+          <div class="d-flex flex-column gap-2 mb-3">
+            <button type="button" class="btn btn-sm btn-efp-glass text-start d-flex align-items-center justify-content-between p-2 btn-switch-persona" data-uid="123123">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-shield-fill-check text-secondary fs-5"></i>
+                <div>
+                  <div class="text-white small fw-bold">Admin Principal</div>
+                  <div class="text-muted font-mono-audit" style="font-size: 11px;">ADMIN_TI (UID: 123123)</div>
+                </div>
+              </div>
+              <span class="badge bg-secondary bg-opacity-20 text-secondary border border-secondary border-opacity-30 small">Activar</span>
+            </button>
+
+            <button type="button" class="btn btn-sm btn-efp-glass text-start d-flex align-items-center justify-content-between p-2 btn-switch-persona" data-uid="789456">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-patch-check-fill text-info fs-5"></i>
+                <div>
+                  <div class="text-white small fw-bold">Dra. Elena Vásquez</div>
+                  <div class="text-muted font-mono-audit" style="font-size: 11px;">AUDITOR_EXTERNO (ISO 14064-3)</div>
+                </div>
+              </div>
+              <span class="badge bg-info bg-opacity-20 text-info border border-info border-opacity-30 small">Activar</span>
+            </button>
+
+            <button type="button" class="btn btn-sm btn-efp-glass text-start d-flex align-items-center justify-content-between p-2 btn-switch-persona" data-uid="456123">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-building-fill-gear text-warning fs-5"></i>
+                <div>
+                  <div class="text-white small fw-bold">Ing. Carlos Mendoza</div>
+                  <div class="text-muted font-mono-audit" style="font-size: 11px;">RESPONSABLE_SEDE (Quilicura)</div>
+                </div>
+              </div>
+              <span class="badge bg-warning bg-opacity-20 text-warning border border-warning border-opacity-30 small">Activar</span>
+            </button>
+
+            <button type="button" class="btn btn-sm btn-efp-glass text-start d-flex align-items-center justify-content-between p-2 btn-switch-persona" data-uid="987654">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-globe-americas text-primary fs-5"></i>
+                <div>
+                  <div class="text-white small fw-bold">Sofía Restrepo</div>
+                  <div class="text-muted font-mono-audit" style="font-size: 11px;">LIDER_SOSTENIBILIDAD (ESG)</div>
+                </div>
+              </div>
+              <span class="badge bg-primary bg-opacity-20 text-primary border border-primary border-opacity-30 small">Activar</span>
+            </button>
+          </div>
+
+          <div class="d-grid">
+            <button type="button" class="btn btn-efp-primary font-headline small" data-bs-dismiss="modal">
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. MODAL: SEDE EXPEDIENTE DOSSIER -->
+  <div class="modal fade" id="modalSedeDetail" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content glass-modal">
+        <div class="modal-body p-4" id="sede-modal-content">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. MODAL: CONFIRMACIÓN ENMIENDA V2 -->
+  <div class="modal fade" id="modalConfirmEnmienda" tabindex="-1" aria-labelledby="modalConfirmEnmiendaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content glass-modal border border-warning border-opacity-30">
+        <div class="modal-header border-bottom border-white-10">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-exclamation-triangle-fill text-warning fs-4"></i>
+            <h5 class="modal-title font-headline text-white mb-0" id="modalConfirmEnmiendaLabel">Confirmar Apertura de Enmienda V2</h5>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <p class="text-white-50 small mb-3">
+            Está a punto de autorizar la apertura de una <strong class="text-warning">Enmienda Excepcional Versión 2</strong> para el ciclo <strong>2026-ANUAL</strong>.
+          </p>
+          <div class="p-3 rounded-3 bg-dark bg-opacity-60 border border-white-10 font-mono-audit small mb-3 text-white-50">
+            <div class="text-secondary fw-bold mb-1"><i class="bi bi-shield-lock-fill me-1"></i>Regla de Inmutabilidad Ledger:</div>
+            <div>• La versión 1 quedará preservada permanentemente en el histórico.</div>
+            <div>• Se generará un nuevo Merkle Tree bifurcado para registrar recálculos.</div>
+            <div>• La acción quedará indexada bajo su firma y rol HSEQ.</div>
+          </div>
+          <p class="text-white-50 small mb-0">
+            ¿Desea formalizar la apertura del nuevo bloque V2?
+          </p>
+        </div>
+        <div class="modal-footer border-top border-white-10">
+          <button type="button" class="btn btn-sm btn-efp-glass text-white-50" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" id="btn-confirm-execute-v2" class="btn btn-sm btn-efp-secondary px-3">
+            <i class="bi bi-check-circle-fill me-1"></i> Confirmar y Abrir Enmienda V2
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Persistent Footer matching React Footer.tsx -->
+  <footer id="app-footer" class="w-full bg-surface-container-lowest/90 backdrop-blur-md border-t border-white/5 transition-all duration-300 with-sidebar position-relative z-1">
+    <div class="w-full px-4 sm:px-6 py-3.5 flex flex-col md:flex-row items-center justify-between gap-3 text-on-surface-variant text-xs">
+      <div class="flex flex-wrap items-center gap-4 font-mono-audit">
+        <span class="text-outline">EFP-CORE v4.8.2</span>
+        <span class="hidden sm:inline text-outline">•</span>
+        <span class="text-outline">SHA-256 LEDGER AUDITABLE</span>
+        <span class="hidden sm:inline text-outline">•</span>
+        <span class="text-secondary flex items-center gap-1.5 font-semibold">
+          <span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+          MOTOR ISO 14064 &amp; 14046 ACTIVO
+        </span>
+        <span class="hidden sm:inline text-outline">•</span>
+        <span class="text-primary flex items-center gap-1">
+          <i class="bi bi-lock-fill" style="font-size: 11px;"></i>
+          TLS 1.3 / AES-256
+        </span>
+      </div>
+
+      <div class="flex items-center gap-4 font-label-sm text-[11px] text-outline">
+        <span>© 2026 Enterprise Environmental Footprint Platform.</span>
+        <span class="hidden md:inline">|</span>
+        <span class="text-on-surface-variant hover:text-primary cursor-pointer transition-colors" data-view="landing">
+          Políticas Ley 1581
+        </span>
+        <span class="text-on-surface-variant hover:text-primary cursor-pointer transition-colors" data-view="landing">
+          Términos de Auditoría
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification Container -->
+  <div id="efp-toast-container" class="efp-toast-container"></div>
+
+  <!-- Bootstrap 5.3.3 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  
+  <!-- Canvas Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
+
+  <!-- Application Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
